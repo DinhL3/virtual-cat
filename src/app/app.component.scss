@@ -1,0 +1,28 @@
+/* filepath: src/app/app.component.scss */
+main {
+  text-align: center;
+  margin: 20px;
+}
+
+h1 {
+  color: #3498db;
+}
+
+section {
+  background-color: #f0f0f0;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
