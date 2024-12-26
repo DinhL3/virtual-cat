@@ -1,9 +1,11 @@
 <main>
   <h1>{{ title }}</h1>
   <router-outlet></router-outlet>
-  <section>
-    <h2>Welcome to Virtual Cat</h2>
-    <p>This is a dummy paragraph to help you learn Angular basics.</p>
-    <button (click)="showAlert()">Click Me</button>
-  </section>
+  <app-container>
+    <section>
+      <h2>Welcome to Virtual Cat</h2>
+      <p>This is a dummy paragraph to help you learn Angular basics.</p>
+      <button (click)="showAlert()">Click Me</button>
+    </section>
+  </app-container>
 </main>
