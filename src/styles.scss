@@ -1,8 +1,9 @@
-@import './styles/_variables';
-@import "./styles/_buttons";
+@use "./styles/_variables";
+@use "./styles/_buttons";
+@use "./styles/_utils";
 
 * {
-    font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
 }
 
 body {

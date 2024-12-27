@@ -1,4 +1,4 @@
-@import '../styles/_variables';
+@use "../styles/variables" as *;
 
 main {
   text-align: center;
@@ -6,11 +6,11 @@ main {
 }
 
 h1 {
-  color: $color-salmon;
+  color: $color-green;
 }
 
 section {
-  background-color: $color-light-orange;
+  background-color: $color-light-yellow;
   padding: 20px;
   border-radius: 8px;
 }

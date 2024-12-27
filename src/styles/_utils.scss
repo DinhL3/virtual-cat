@@ -1,0 +1,17 @@
+@use "variables" as *;
+
+.text-black {
+  color: $color-black;
+}
+
+.text-white {
+  color: $color-white;
+}
+
+.text-primary {
+  color: $color-green;
+}
+
+.text-secondary {
+  color: $color-dark-orange;
+}

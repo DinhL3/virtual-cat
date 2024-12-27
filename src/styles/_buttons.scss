@@ -1,3 +1,5 @@
+@use "variables" as *;
+
 .button {
   padding: 10px 20px;
   border-radius: 6px;
@@ -7,19 +9,36 @@
   text-transform: uppercase;
 
   &:hover {
-        transform: scale(1.1);
-    }
-
-  &.filled {
-    background-color: $color-cerulean;
-    color: white;
-    border: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: scale(1.1);
   }
 
-  &.outlined {
-    background-color: transparent;
-    color: $color-cerulean;
-    border: 2px solid $color-cerulean;
+  &.primary {
+    &.filled {
+      background-color: $color-green;
+      color: white;
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    &.outlined {
+      background-color: transparent;
+      color: $color-green;
+      border: 2px solid $color-green;
+    }
+  }
+
+  &.secondary {
+    &.filled {
+      background-color: $color-dark-orange;
+      color: white;
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    &.outlined {
+      background-color: transparent;
+      color: $color-dark-orange;
+      border: 2px solid $color-dark-orange;
+    }
   }
 }
