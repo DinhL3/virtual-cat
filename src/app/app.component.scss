@@ -1,28 +1,16 @@
-/* filepath: src/app/app.component.scss */
+@import '../styles/_variables';
+
 main {
   text-align: center;
   margin: 20px;
 }
 
 h1 {
-  color: #9d8189;
+  color: $color-salmon;
 }
 
 section {
-  background-color: #ffe5d9;
+  background-color: $color-light-orange;
   padding: 20px;
   border-radius: 8px;
-}
-
-button {
-  background-color: #9d8189;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #2980b9;
 }

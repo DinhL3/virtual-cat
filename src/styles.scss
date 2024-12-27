@@ -1,8 +1,12 @@
-@import '../styles/_variables';
+@import './styles/_variables';
+@import "./styles/_buttons";
+
+* {
+    font-family: 'Nunito', sans-serif;
+}
 
 body {
   padding: 0;
   margin: 0;
-  font-family: 'Nunito', sans-serif;
   background-color: white;
 }
