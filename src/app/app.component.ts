@@ -5,11 +5,10 @@ import { matLogIn } from '@ng-icons/material-icons/baseline';
 import { gameCat } from '@ng-icons/game-icons';
 
 import { ContainerComponent } from './container/container.component';
-import { CardComponent } from './card/card.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ContainerComponent, NgIcon, CardComponent],
+  imports: [RouterOutlet, ContainerComponent, NgIcon],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   viewProviders: [provideIcons({ matLogIn, gameCat })],

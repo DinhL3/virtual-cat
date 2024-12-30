@@ -1,58 +1,63 @@
 @use "../styles/variables" as *;
 
 main {
-  text-align: center;
-  margin-top: 32px;
-}
-
-h2 {
-  color: $color-green;
-}
-
-.login-form {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 15px;
-  margin-top: 20px;
+  height: 100vh;
+  text-align: center;
+}
 
-  .form-group {
+.card {
+  width: 400px;
+
+  ::ng-deep ng-icon[name="gameCat"] {
+    color: $color-dark-blue;
+  }
+
+  h2 {
+    color: $color-dark-blue;
+  }
+
+  .login-form {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-    max-width: 300px;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
 
-    label {
-      margin-bottom: 5px;
-      // font-weight: 600;
-    }
-
-    .form-control {
+    .form-group {
+      display: flex;
+      flex-direction: column;
       width: 100%;
-      padding: 10px;
-      color: $color-dark-green;
-      border: 2px solid rgba($color-green, 0.4);
-      border-radius: 4px;
-      font-size: 16px;
-      background: none;
-      transition: all 0.2s ease;
+      max-width: 300px;
 
-      &:focus {
-        outline: none;
-        border: 2px solid;
-        border-color: $color-green;
-        background-color: transparent;
+      label {
+        margin-bottom: 5px;
+        align-self: flex-start;
+      }
+
+      .form-control {
+        padding: 10px;
+        color: $color-dark-blue;
+        border: 2px solid rgba($color-dark-blue, 0.4);
+        border-radius: 4px;
+        font-size: 16px;
+        background: none;
+        transition: all 0.2s ease;
+
+        &:focus {
+          outline: none;
+          border: 2px solid;
+          border-color: $color-dark-blue;
+          background-color: transparent;
+        }
       }
     }
-  }
 
-  .button {
-    margin-top: 16px;
-    margin-bottom: 8px;
+    .button {
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
   }
-}
-
-::ng-deep ng-icon[name="gameCat"] {
-  color: $color-green;
 }

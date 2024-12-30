@@ -9,11 +9,11 @@
 }
 
 .text-primary {
-  color: $color-green;
+  color: $color-dark-blue;
 }
 
 .text-secondary {
-  color: $color-dark-orange;
+  color: $color-salmon;
 }
 
 .bg-none {
@@ -28,10 +28,13 @@
   background-color: $color-light-yellow;
 }
 
-.bg-orange {
-  background-color: $color-orange;
+.bg-light-orange {
+  background-color: $color-light-orange;
 }
 
-.bg-green {
-  background-color: $color-green;
+.card {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 32px;
+  box-sizing: border-box;
 }

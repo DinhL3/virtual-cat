@@ -24,7 +24,7 @@
 
   &.primary {
     &.filled {
-      background-color: $color-green;
+      background-color: $color-blue;
       color: white;
       border: none;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -32,14 +32,14 @@
 
     &.outlined {
       background-color: transparent;
-      color: $color-green;
-      border: 2px solid $color-green;
+      color: $color-blue;
+      border: 2px solid $color-blue;
     }
   }
 
   &.secondary {
     &.filled {
-      background-color: $color-dark-orange;
+      background-color: $color-salmon;
       color: white;
       border: none;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -47,8 +47,8 @@
 
     &.outlined {
       background-color: transparent;
-      color: $color-dark-orange;
-      border: 2px solid $color-dark-orange;
+      color: $color-salmon;
+      border: 2px solid $color-salmon;
     }
   }
 }

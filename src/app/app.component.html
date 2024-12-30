@@ -1,7 +1,7 @@
 <main>
   <router-outlet></router-outlet>
   <app-container>
-    <app-card customClass="bg-light-yellow">
+    <div class="card bg-light-yellow">
       <ng-icon name="gameCat" size="32px"></ng-icon>
       <h2>Log in to Virtual Cat</h2>
       <form class="login-form">
@@ -13,11 +13,11 @@
           <label for="password">Password</label>
           <input type="password" id="password" class="form-control" />
         </div>
-        <button type="submit" class="button filled primary">
+        <button type="submit" class="button filled secondary">
           <ng-icon name="matLogIn" /> Log In
         </button>
       </form>
       <h4><span>Don't have an account? </span> <a>Sign up</a></h4>
-    </app-card>
+    </div>
   </app-container>
 </main>
