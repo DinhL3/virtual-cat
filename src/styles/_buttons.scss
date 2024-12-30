@@ -7,6 +7,16 @@
   transition: 0.3s;
   font-weight: 600;
   text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1;
+
+  ng-icon {
+    font-size: 1.2em;
+    display: inline-flex;
+    align-items: center;
+  }
 
   &:hover {
     transform: scale(1.1);

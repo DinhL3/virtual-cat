@@ -1,13 +1,23 @@
 <main>
-  <h1>{{ title }}</h1>
   <router-outlet></router-outlet>
   <app-container>
-    <section>
-      <h2>Welcome to Virtual Cat</h2>
-      <p>This is a dummy paragraph to help you learn Angular basics.</p>
-      <button class="button outlined secondary" (click)="showAlert()">
-        Click Me
-      </button>
-    </section>
+    <app-card customClass="bg-light-yellow">
+      <ng-icon name="gameCat" size="32px"></ng-icon>
+      <h2>Log in to Virtual Cat</h2>
+      <form class="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" class="form-control" />
+        </div>
+        <button type="submit" class="button filled primary">
+          <ng-icon name="matLogIn" /> Log In
+        </button>
+      </form>
+      <h4><span>Don't have an account? </span> <a>Sign up</a></h4>
+    </app-card>
   </app-container>
 </main>
