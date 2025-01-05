@@ -1,9 +1,9 @@
-@use "./styles/_variables" as *;
-@use "./styles/_buttons";
-@use "./styles/_utils";
+@use './styles/_variables' as *;
+@use './styles/_buttons';
+@use './styles/_utils';
 
 * {
-  font-family: "Quicksand", sans-serif;
+  font-family: 'Quicksand', sans-serif;
 }
 
 body {
