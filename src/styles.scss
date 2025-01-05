@@ -12,6 +12,13 @@ body {
   background-color: $color-light-orange;
 }
 
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
 h1,
 h2,
 h3,

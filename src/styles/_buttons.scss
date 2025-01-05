@@ -5,12 +5,15 @@
   border-radius: 6px;
   cursor: pointer;
   transition: 0.3s;
+  font-size: 1rem;
   font-weight: 600;
   text-transform: uppercase;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   line-height: 1;
+  text-decoration: none;
+  color: inherit;
 
   ng-icon {
     font-size: 1.2em;

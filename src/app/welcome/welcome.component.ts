@@ -4,11 +4,10 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { gameCat } from '@ng-icons/game-icons';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
+  selector: 'app-welcome',
   imports: [RouterLink, NgIcon],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
+  templateUrl: './welcome.component.html',
+  styleUrl: './welcome.component.scss',
   viewProviders: [provideIcons({ gameCat })],
 })
-export class LoginComponent {}
+export class WelcomeComponent {}
