@@ -48,7 +48,6 @@ ng serve
 ## 📖 Usage
 
 - Register or log in to your account.
-- Adopt a virtual cat from the adoption center.
 - Take care of your cat by feeding, playing, and grooming it.
 - Enjoy watching your cat grow and thrive!
 
@@ -62,11 +61,3 @@ Contributions are welcome! Please follow these steps:
 4. Commit your changes (`git commit -m 'Add some feature'`).
 5. Push to the branch (`git push origin feature-branch`).
 6. Open a pull request.
-
-## 📄 License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## 📫 Contact
-
-For any inquiries, please contact [Lqdquangdinh@gmail.com](mailto:Lqdquangdinh@gmail.com).
