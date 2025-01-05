@@ -1,4 +1,5 @@
 @use "../styles/variables" as *;
+@use "../styles/_form-elements";
 
 main {
   display: flex;
@@ -25,35 +26,6 @@ main {
     align-items: center;
     gap: 15px;
     margin-top: 20px;
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      max-width: 300px;
-
-      label {
-        margin-bottom: 5px;
-        align-self: flex-start;
-      }
-
-      .form-control {
-        padding: 10px;
-        color: $color-dark-blue;
-        border: 2px solid rgba($color-dark-blue, 0.4);
-        border-radius: 4px;
-        font-size: 16px;
-        background: none;
-        transition: all 0.2s ease;
-
-        &:focus {
-          outline: none;
-          border: 2px solid;
-          border-color: $color-dark-blue;
-          background-color: transparent;
-        }
-      }
-    }
 
     .button {
       margin-top: 16px;
