@@ -1,59 +1,72 @@
-# VirtualCat
+# Virtual Cat 🐱
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.6.
+A virtual pet game built with Angular where you can adopt and take care of your own digital cat companion.
 
-## Development server
+## 🚀 Features
 
-To start a local development server, run:
+- Adopt virtual cats
+- Login/Register system
+- Simple and intuitive UI
+- Cross-platform web application
+
+## 🛠️ Technologies
+
+- Angular 19
+- TypeScript
+- SCSS
+- @ng-icons library
+
+## 📋 Prerequisites
+
+- Node.js (LTS version recommended)
+- npm (comes with Node.js)
+- Angular CLI (`npm install -g @angular/cli`)
+
+## 🔧 Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/your-username/virtual-cat.git
+cd virtual-cat
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Start the development server:
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+4. Open your browser and navigate to `http://localhost:4200/`.
 
-## Code scaffolding
+## 📖 Usage
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Register or log in to your account.
+- Adopt a virtual cat from the adoption center.
+- Take care of your cat by feeding, playing, and grooming it.
+- Enjoy watching your cat grow and thrive!
 
-```bash
-ng generate component component-name
-```
+## 🤝 Contributing
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Contributions are welcome! Please follow these steps:
 
-```bash
-ng generate --help
-```
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature-branch`).
+3. Make your changes.
+4. Commit your changes (`git commit -m 'Add some feature'`).
+5. Push to the branch (`git push origin feature-branch`).
+6. Open a pull request.
 
-## Building
+## 📄 License
 
-To build the project run:
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-```bash
-ng build
-```
+## 📫 Contact
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+For any inquiries, please contact [Lqdquangdinh@gmail.com](mailto:Lqdquangdinh@gmail.com).
