@@ -25,5 +25,9 @@
       border-color: $color-dark-blue;
       background-color: transparent;
     }
+
+    &.error {
+      border-color: $color-salmon;
+    }
   }
 }

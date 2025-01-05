@@ -1,6 +1,8 @@
 .card {
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .buttons {

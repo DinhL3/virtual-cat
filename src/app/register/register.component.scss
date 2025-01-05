@@ -1,0 +1,28 @@
+@use "../../styles/form-elements" as *;
+@use "../../styles/variables" as *;
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+h2 {
+  margin-bottom: 16px;
+}
+
+h4 {
+  margin-top: 8px;
+}
+
+.error-message {
+  color: $color-salmon;
+  font-size: 12px;
+  margin-top: 4px;
+  text-align: left;
+}
