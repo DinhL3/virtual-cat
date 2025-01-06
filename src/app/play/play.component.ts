@@ -5,7 +5,7 @@ import { AuthService } from '../services/auth.service';
 @Component({
   selector: 'app-play',
   standalone: true,
-  imports: [RouterLink],
+  // imports: [RouterLink],
   templateUrl: './play.component.html',
   styleUrl: './play.component.scss',
 })
