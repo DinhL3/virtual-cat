@@ -1,11 +1,11 @@
 @use '../../styles/form-elements' as *;
 @use '../../styles/variables' as *;
+@use '../../styles/utils' as *;
 
 .card {
   width: 100%;
   max-width: 400px;
   text-align: center;
-  box-sizing: border-box;
 }
 
 .form-group {

@@ -1,11 +1,11 @@
 @use '../../styles/form-elements' as *;
 @use '../../styles/variables' as *;
+@use '../../styles/utils' as *;
 
 .card {
   width: 100%;
   max-width: 400px;
   text-align: center;
-  box-sizing: border-box;
 }
 
 .form-group {
@@ -18,11 +18,4 @@ h2 {
 
 h4 {
   margin-top: 8px;
-}
-
-.error-message {
-  color: $color-salmon;
-  font-size: 12px;
-  margin-top: 4px;
-  text-align: left;
 }

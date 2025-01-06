@@ -22,6 +22,7 @@ import { HttpClient } from '@angular/common/http';
 export class RegisterComponent {
   registerForm: FormGroup;
   errorMessage = '';
+  loading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -36,31 +37,29 @@ export class RegisterComponent {
 
   onSubmit() {
     if (this.registerForm.valid) {
-      const { username, password } = this.registerForm.value;
+      this.loading = true;
+      this.registerForm.disable();
 
-      // Send a POST request to register
       this.http
-        .post('http://localhost:5000/api/auth/register', { username, password })
+        .post(
+          'http://localhost:5000/api/auth/register',
+          this.registerForm.value,
+        )
         .subscribe({
           next: (response: any) => {
-            /**
-             * Example response:
-             * {
-             *   "message": "User registered successfully",
-             *   "token": "eyJhbGciOiJI...",
-             *   "user": { "id": "...", "username": "testuser" }
-             * }
-             */
-            // Store the token in local storage (or session storage)
             localStorage.setItem('authToken', response.token);
-
-            // Redirect to /play
             this.router.navigate(['/play']);
           },
           error: (err) => {
             console.error('Registration failed:', err);
             this.errorMessage =
               err?.error?.message || 'Failed to register. Please try again.';
+            this.loading = false;
+            this.registerForm.enable();
+          },
+          complete: () => {
+            this.registerForm.enable();
+            this.loading = false;
           },
         });
     } else {

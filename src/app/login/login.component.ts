@@ -10,6 +10,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -22,6 +23,7 @@ import { HttpClient } from '@angular/common/http';
 export class LoginComponent {
   loginForm: FormGroup;
   errorMessage = '';
+  loading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -36,29 +38,26 @@ export class LoginComponent {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      const { username, password } = this.loginForm.value;
+      this.loading = true;
+      this.loginForm.disable();
 
       this.http
-        .post('http://localhost:5000/api/auth/login', { username, password })
+        .post('http://localhost:5000/api/auth/login', this.loginForm.value)
+        .pipe(delay(2000))
         .subscribe({
           next: (response: any) => {
-            /**
-             * Example of what your login endpoint might return:
-             * {
-             *   "message": "Login successful",
-             *   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-             *   "user": { "id": "...", "username": "testuser" }
-             * }
-             */
             localStorage.setItem('authToken', response.token);
-
-            // Navigate to '/play' on successful login
             this.router.navigate(['/play']);
           },
           error: (err) => {
-            console.error('Login failed:', err);
             this.errorMessage =
               err?.error?.message || 'Login failed. Please try again.';
+            this.loading = false;
+            this.loginForm.enable();
+          },
+          complete: () => {
+            this.loginForm.enable();
+            this.loading = false;
           },
         });
     } else {
