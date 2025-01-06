@@ -43,7 +43,7 @@ export class LoginComponent {
 
       this.http
         .post('http://localhost:5000/api/auth/login', this.loginForm.value)
-        .pipe(delay(2000))
+        // .pipe(delay(2000))
         .subscribe({
           next: (response: any) => {
             localStorage.setItem('authToken', response.token);
