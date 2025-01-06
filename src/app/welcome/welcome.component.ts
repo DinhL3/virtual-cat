@@ -5,6 +5,7 @@ import { gameCat } from '@ng-icons/game-icons';
 
 @Component({
   selector: 'app-welcome',
+  standalone: true,
   imports: [RouterLink, NgIcon],
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.scss',

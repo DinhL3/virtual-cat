@@ -42,6 +42,7 @@
       Register
     </button>
   </form>
+  <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
   <h4>
     <span>Already have an account? </span>
     <a routerLink="/login">Sign in</a>
