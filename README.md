@@ -2,12 +2,28 @@
 
 A virtual pet game built with Angular where you can adopt and take care of your own digital cat companion.
 
-## 🚀 Features
+## Features
 
-- Adopt virtual cats
-- Login/Register system
-- Simple and intuitive UI
-- Cross-platform web application
+This project is under active development. Here's the current status of features:
+
+### ✅ Implemented
+
+- Basic user authentication (register and login)
+- Interactive routes for login, register, and play
+
+### 🚧 In Progress
+
+- Adopt cat screen (choose name, fur pattern)
+- Art sprites for the cat
+
+### 📅 Planned
+
+- Main game mechanics to care for the virtual cat (feeding, grooming, etc.)
+- Cat animations
+
+### 🔄 Continuous Improvements
+
+- Find and fix bugs, UI/UX improvements to ensure smooth user usage
 
 ## 🛠️ Technologies
 
@@ -50,14 +66,3 @@ ng serve
 - Register or log in to your account.
 - Take care of your cat by feeding, playing, and grooming it.
 - Enjoy watching your cat grow and thrive!
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Make your changes.
-4. Commit your changes (`git commit -m 'Add some feature'`).
-5. Push to the branch (`git push origin feature-branch`).
-6. Open a pull request.
