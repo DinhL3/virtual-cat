@@ -1,3 +1,4 @@
+// register.component.ts
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -9,7 +10,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -26,7 +27,7 @@ export class RegisterComponent {
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
+    private auth: AuthService,
     private router: Router,
   ) {
     this.registerForm = this.fb.group({
@@ -40,28 +41,33 @@ export class RegisterComponent {
       this.loading = true;
       this.registerForm.disable();
 
-      this.http
-        .post(
-          'http://localhost:5000/api/auth/register',
-          this.registerForm.value,
-        )
-        .subscribe({
-          next: (response: any) => {
-            localStorage.setItem('authToken', response.token);
-            this.router.navigate(['/play']);
-          },
-          error: (err) => {
-            console.error('Registration failed:', err);
-            this.errorMessage =
-              err?.error?.message || 'Failed to register. Please try again.';
+      const { username, password } = this.registerForm.value;
+
+      this.auth.register(username, password).subscribe({
+        next: (response) => {
+          if (response.token && response.user) {
+            // Ensure token is set before navigation
+            setTimeout(() => {
+              this.router.navigate(['/play']);
+            }, 100);
+          } else {
+            this.errorMessage = 'Registration successful but login failed';
             this.loading = false;
             this.registerForm.enable();
-          },
-          complete: () => {
-            this.registerForm.enable();
-            this.loading = false;
-          },
-        });
+          }
+        },
+        error: (err) => {
+          console.error('Registration failed:', err);
+          this.errorMessage =
+            err?.error?.message || 'Failed to register. Please try again.';
+          this.loading = false;
+          this.registerForm.enable();
+        },
+        complete: () => {
+          this.registerForm.enable();
+          this.loading = false;
+        },
+      });
     } else {
       this.registerForm.markAllAsTouched();
     }
@@ -70,6 +76,7 @@ export class RegisterComponent {
   get username() {
     return this.registerForm.get('username');
   }
+
   get password() {
     return this.registerForm.get('password');
   }

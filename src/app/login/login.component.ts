@@ -9,8 +9,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { delay } from 'rxjs/operators';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -27,7 +26,7 @@ export class LoginComponent {
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
+    private auth: AuthService,
     private router: Router,
   ) {
     this.loginForm = this.fb.group({
@@ -41,25 +40,23 @@ export class LoginComponent {
       this.loading = true;
       this.loginForm.disable();
 
-      this.http
-        .post('http://localhost:5000/api/auth/login', this.loginForm.value)
-        // .pipe(delay(2000))
-        .subscribe({
-          next: (response: any) => {
-            localStorage.setItem('authToken', response.token);
-            this.router.navigate(['/play']);
-          },
-          error: (err) => {
-            this.errorMessage =
-              err?.error?.message || 'Login failed. Please try again.';
-            this.loading = false;
-            this.loginForm.enable();
-          },
-          complete: () => {
-            this.loginForm.enable();
-            this.loading = false;
-          },
-        });
+      const { username, password } = this.loginForm.value;
+
+      this.auth.login(username, password).subscribe({
+        next: () => {
+          this.router.navigate(['/play']);
+        },
+        error: (err) => {
+          this.errorMessage =
+            err?.error?.message || 'Login failed. Please try again.';
+          this.loading = false;
+          this.loginForm.enable();
+        },
+        complete: () => {
+          this.loginForm.enable();
+          this.loading = false;
+        },
+      });
     } else {
       this.loginForm.markAllAsTouched();
     }
