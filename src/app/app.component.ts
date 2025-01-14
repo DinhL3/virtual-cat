@@ -14,8 +14,4 @@ import { gameCat } from '@ng-icons/game-icons';
 })
 export class AppComponent {
   title = 'Virtual Cat';
-
-  showAlert() {
-    alert('Button clicked!');
-  }
 }

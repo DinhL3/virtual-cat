@@ -1,4 +1,4 @@
-// cat.service.ts
+// src/services/cat.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -20,7 +20,6 @@ export class CatService {
   ) {}
 
   private handleError(error: HttpErrorResponse) {
-    // Only handle auth errors here, let the component handle other errors
     if (error.status === 401) {
       this.auth.logout();
       this.router.navigate(['/login']);

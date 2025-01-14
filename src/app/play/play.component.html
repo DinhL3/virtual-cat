@@ -1,9 +1,23 @@
-<!-- play.component.html -->
-<div class="card bg-light-yellow">
-  <h2>Welcome back, {{ username }}!</h2>
+<!-- src/app/play/play.component.html -->
 
-  <div class="buttons">
-    <button class="button filled secondary" (click)="onLogout()">
+<div class="card bg-light-yellow">
+  <h2>Welcome, {{ username }}!</h2>
+
+  <div *ngIf="loading">Checking for cats...</div>
+
+  <div *ngIf="!loading">
+    <div *ngIf="!hasCat">
+      <p>You don't have a cat yet.</p>
+      <button class="button filled primary" (click)="onAdopt()">
+        Adopt a cat
+      </button>
+    </div>
+
+    <button
+      id="logout-button"
+      class="button filled secondary"
+      (click)="onLogout()"
+    >
       Log Out
     </button>
   </div>

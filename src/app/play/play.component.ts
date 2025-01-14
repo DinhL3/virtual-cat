@@ -1,4 +1,4 @@
-// play.component.ts
+// src/app/play/play.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -12,7 +12,7 @@ import { catchError, finalize, of } from 'rxjs';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './play.component.html',
-  styleUrl: './play.component.scss',
+  styleUrls: ['./play.component.scss'], // changed to styleUrls
 })
 export class PlayComponent implements OnInit {
   hasCat: boolean = false;
@@ -35,7 +35,9 @@ export class PlayComponent implements OnInit {
     }
 
     this.username = user.username;
-    // this.checkForCat();
+
+    // **Important**: We want to check if the user already has a cat.
+    this.checkForCat();
   }
 
   private checkForCat() {
@@ -45,8 +47,8 @@ export class PlayComponent implements OnInit {
       .pipe(
         catchError((error) => {
           console.error('Error fetching cat:', error);
+          // If we get a 401, it might be an expired token or unauthorized user
           if (error.status === 401) {
-            // Only logout and redirect if it's an authentication error
             this.auth.logout();
             this.router.navigate(['/login']);
           }
@@ -57,7 +59,7 @@ export class PlayComponent implements OnInit {
         }),
       )
       .subscribe((cat) => {
-        // cat being null is a valid state - it just means the user hasn't adopted yet
+        // cat being null = user has no cat
         this.cat = cat;
         this.hasCat = !!cat;
       });
