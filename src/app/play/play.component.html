@@ -3,15 +3,17 @@
 <div class="card bg-light-yellow">
   <h2>Welcome, {{ username }}!</h2>
 
-  <div *ngIf="loading">Checking for cats...</div>
+  @if (loading) {
+    <div>Checking for cats...</div>
+  }
 
-  <div *ngIf="!loading">
-    <div *ngIf="!hasCat">
+  @if (!loading) {
+    @if (!hasCat) {
       <p>You don't have a cat yet.</p>
       <button class="button filled primary" (click)="onAdopt()">
         Adopt a cat
       </button>
-    </div>
+    }
 
     <button
       id="logout-button"
@@ -20,5 +22,5 @@
     >
       Log Out
     </button>
-  </div>
+  }
 </div>
