@@ -48,7 +48,7 @@ export class RegisterComponent {
           if (response.token && response.user) {
             // Ensure token is set before navigation
             setTimeout(() => {
-              this.router.navigate(['/play']);
+              this.router.navigate(['/main-menu']);
             }, 100);
           } else {
             this.errorMessage = 'Registration successful but login failed';

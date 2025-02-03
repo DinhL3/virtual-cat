@@ -44,7 +44,7 @@ export class LoginComponent {
 
       this.auth.login(username, password).subscribe({
         next: () => {
-          this.router.navigate(['/play']);
+          this.router.navigate(['/main-menu']);
         },
         error: (err) => {
           this.errorMessage =

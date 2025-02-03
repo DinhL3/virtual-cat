@@ -1,0 +1,24 @@
+<div class="card bg-light-yellow">
+  <h2>Welcome, {{ username }}!</h2>
+
+  @if (loading) {
+    <div>Checking for existing data...</div>
+  }
+
+  @if (!loading) {
+    @if (!hasGameSaves) {
+      <p>You have no game saves. Begin a new journey?</p>
+      <button class="button filled primary" (click)="onNewGame()">
+        New game
+      </button>
+    }
+
+    <button
+      id="logout-button"
+      class="button filled secondary"
+      (click)="onLogout()"
+    >
+      Log Out
+    </button>
+  }
+</div>

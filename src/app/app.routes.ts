@@ -2,9 +2,9 @@ import { Routes } from '@angular/router';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
-import { PlayComponent } from './play/play.component';
 import { authGuard } from './guards/auth.guard';
 import { noAuthGuard } from './guards/no-auth.guard';
+import { MainMenuComponent } from './main-menu/main-menu.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/welcome', pathMatch: 'full' },
@@ -15,6 +15,6 @@ export const routes: Routes = [
     component: RegisterComponent,
     canActivate: [noAuthGuard],
   },
-  { path: 'play', component: PlayComponent, canActivate: [authGuard] },
+  { path: 'main-menu', component: MainMenuComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '/welcome' },
 ];
