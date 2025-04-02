@@ -39,3 +39,11 @@
   box-sizing: border-box;
   text-align: center;
 }
+
+.vertical-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}

@@ -10,39 +10,27 @@
   }
 
   @if (!loading) {
-    <div class="game-actions">
+    <div class="vertical-stack">
       @if (hasGameSaves) {
-        <div class="save-info">
-          <p>You have an existing game save!</p>
-          @if (saveData?.gameState?.characterName) {
-            <p>Character: {{ saveData.gameState.characterName }}</p>
-          }
-          @if (saveData?.gameState?.currentDay) {
-            <p>Day: {{ saveData.gameState.currentDay }}</p>
-          }
-        </div>
+        <p>You have an existing game save!</p>
         <div class="button-group">
-          <button class="button filled primary" (click)="onResumeGame()">
+          <button class="button outlined primary" (click)="onResumeGame()">
             Resume Game
-          </button>
-          <button class="button outlined" (click)="onNewGame()">
-            New Game
           </button>
         </div>
       } @else {
         <p>You have no game saves. Begin a new journey?</p>
-        <button class="button filled primary" (click)="onNewGame()">
-          New Game
-        </button>
       }
+      <button class="button outlined primary" (click)="onNewGame()">
+        New Game
+      </button>
+      <button
+        id="logout-button"
+        class="button filled secondary"
+        (click)="onLogout()"
+      >
+        Log Out
+      </button>
     </div>
-
-    <button
-      id="logout-button"
-      class="button filled secondary"
-      (click)="onLogout()"
-    >
-      Log Out
-    </button>
   }
 </div>

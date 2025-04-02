@@ -1,5 +1,5 @@
 <div class="card bg-light-yellow">
-  <h2>Start New Cat Shelter Game</h2>
+  <h2>New Game</h2>
 
   @if (error) {
     <div class="error-message">{{ error }}</div>
@@ -7,10 +7,11 @@
 
   <form [formGroup]="newGameForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
-      <label for="characterName">Character Name:</label>
+      <!-- <label for="characterName">Character Name:</label> -->
       <input
         id="characterName"
         type="text"
+        class="form-control"
         formControlName="characterName"
         placeholder="Enter your character name"
         [ngClass]="{
@@ -20,22 +21,22 @@
         }"
       />
 
-      @if (
+      <!-- @if (
         newGameForm.get('characterName')?.invalid &&
         newGameForm.get('characterName')?.touched
       ) {
-        <div class="error-hint">
+        <div class="error-message">
           @if (newGameForm.get('characterName')?.errors?.['required']) {
             <span>Character name is required</span>
           }
           @if (newGameForm.get('characterName')?.errors?.['minlength']) {
-            <span>Character name must be at least 2 characters</span>
+            <span>Character name must be at least 1 characters</span>
           }
           @if (newGameForm.get('characterName')?.errors?.['maxlength']) {
             <span>Character name cannot exceed 20 characters</span>
           }
         </div>
-      }
+      } -->
     </div>
 
     <div class="button-group">
@@ -47,12 +48,13 @@
         @if (loading) {
           <span>Creating...</span>
         } @else {
-          <span>Start Game</span>
+          <span>Start</span>
         }
       </button>
       <button
+        id="cancelButton"
         type="button"
-        class="button outlined"
+        class="button filled secondary"
         (click)="onCancel()"
         [disabled]="loading"
       >

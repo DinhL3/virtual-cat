@@ -32,7 +32,7 @@ export class NewGameComponent {
         '',
         [
           Validators.required,
-          Validators.minLength(2),
+          Validators.minLength(1),
           Validators.maxLength(20),
         ],
       ],
