@@ -14,20 +14,29 @@
       @if (hasGameSaves) {
         <p>You have an existing game save!</p>
         <div class="button-group">
-          <button class="button outlined primary" (click)="onResumeGame()">
+          <button
+            class="button outlined primary"
+            (click)="onResumeGame()"
+            [disabled]="loading"
+          >
             Resume Game
           </button>
         </div>
       } @else {
         <p>You have no game saves. Begin a new journey?</p>
       }
-      <button class="button outlined primary" (click)="onNewGame()">
+      <button
+        class="button outlined primary"
+        (click)="onNewGame()"
+        [disabled]="loading"
+      >
         New Game
       </button>
       <button
         id="logout-button"
         class="button filled secondary"
         (click)="onLogout()"
+        [disabled]="loading"
       >
         Log Out
       </button>
