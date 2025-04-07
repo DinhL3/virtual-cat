@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 interface GameSaveResponse {
   hasSave: boolean;
@@ -21,7 +22,7 @@ interface NewGameResponse {
   providedIn: 'root',
 })
 export class GameService {
-  private apiUrl = `http://localhost:5001/api/game`;
+  private apiUrl = `${environment.apiUrl}/game`;
 
   constructor(private http: HttpClient) {}
 

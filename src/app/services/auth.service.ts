@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface User {
   _id: string;
@@ -18,7 +19,7 @@ export interface AuthResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:5001/api/auth';
+  private baseUrl = `${environment.apiUrl}/auth`;
   private currentUser: User | null = null;
 
   constructor(private http: HttpClient) {
