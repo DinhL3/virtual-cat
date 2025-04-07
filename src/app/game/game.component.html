@@ -1,0 +1,25 @@
+<div class="game-container bg-light-yellow">
+  @if (errorMessage) {
+    <div class="error-message">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <h2>Loading game...</h2>
+      <div class="spinner"></div>
+    </div>
+  }
+
+  @if (!isLoading && !errorMessage) {
+    <div class="game-content">
+      <h2>Game loaded!</h2>
+      @if (gameSave) {
+        <div class="game-info">
+          <p>Character Name: {{ gameSave.gameState.characterName }}</p>
+        </div>
+      }
+    </div>
+  }
+</div>

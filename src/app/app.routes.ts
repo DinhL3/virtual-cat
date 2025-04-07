@@ -6,6 +6,7 @@ import { authGuard } from './guards/auth.guard';
 import { noAuthGuard } from './guards/no-auth.guard';
 import { MainMenuComponent } from './main-menu/main-menu.component';
 import { NewGameComponent } from './new-game/new-game.component';
+import { GameComponent } from './game/game.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/welcome', pathMatch: 'full' },
@@ -18,5 +19,6 @@ export const routes: Routes = [
   },
   { path: 'main-menu', component: MainMenuComponent, canActivate: [authGuard] },
   { path: 'new-game', component: NewGameComponent, canActivate: [authGuard] },
+  { path: 'game', component: GameComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '/welcome' },
 ];
