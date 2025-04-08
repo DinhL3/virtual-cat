@@ -1,6 +1,6 @@
 <div class="card bg-light-yellow">
-  <ng-icon name="gameCat" size="32px"></ng-icon>
-  <h2>Log in to Virtual Cat</h2>
+  <ng-icon name="gameCat" size="32px" class="text-primary"></ng-icon>
+  <h2 class="text-primary">Log in to Virtual Cat</h2>
   <!-- Bind to loginForm -->
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
     <div class="form-group">
@@ -43,7 +43,7 @@
     <p class="error-message">{{ errorMessage }}</p>
   }
   <h4>
-    <span>Don't have an account? </span>
+    <span class="text-primary">Don't have an account? </span>
     <a routerLink="/register">Sign up</a>
   </h4>
 </div>
