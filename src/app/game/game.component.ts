@@ -19,38 +19,12 @@ export class GameComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Check if this is a new game or loading an existing one
-    this.route.queryParams.subscribe((params) => {
-      const isNewGame = params['new'] === 'true';
+    // First, always attempt to load the game directly
+    this.loadGameSave();
 
-      if (isNewGame) {
-        // A new game was just created, data should already be in the backend
-        this.loadGameSave();
-      } else {
-        // Check if there's an existing save
-        this.checkExistingSave();
-      }
-    });
-  }
-
-  private checkExistingSave(): void {
-    this.gameService.checkGameSave().subscribe({
-      next: (response) => {
-        if (response.hasSave) {
-          this.loadGameSave();
-        } else {
-          // No save found, redirect to new game creation
-          this.router.navigate(['/new-game']);
-        }
-      },
-      error: (error) => {
-        this.isLoading = false;
-        this.errorMessage =
-          'Failed to check for existing save: ' +
-          (error.message || 'Unknown error');
-        console.error('Error checking game save:', error);
-      },
-    });
+    // 1. If coming from new game, the save will exist
+    // 2. If trying to resume but no save exists, the loadGame() API will return an appropriate error
+    // 3. We can handle that error in the loadGameSave() method
   }
 
   private loadGameSave(): void {
@@ -61,9 +35,15 @@ export class GameComponent implements OnInit {
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage =
-          'Failed to load game: ' + (error.message || 'Unknown error');
-        console.error('Error loading game save:', error);
+
+        // If error is due to no save found, redirect to new game
+        if (error.status === 404) {
+          this.router.navigate(['/new-game']);
+        } else {
+          this.errorMessage =
+            'Failed to load game: ' + (error.message || 'Unknown error');
+          console.error('Error loading game save:', error);
+        }
       },
     });
   }
