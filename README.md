@@ -1,6 +1,6 @@
-# Virtual Cat 🐱
+# Virtual Cat (Cat Shelter Simulator) 🐱🏠
 
-A virtual pet game built with Angular where you can adopt and take care of your own digital cat companion.
+A shelter management game built with Angular where you run your own cat shelter and prepare feline friends for their forever homes.
 
 ## Features
 
@@ -13,17 +13,28 @@ This project is under active development. Here's the current status of features:
 
 ### 🚧 In Progress
 
-- Adopt cat screen (choose name, fur pattern)
-- Art sprites for the cat
+- Shelter management interface
+- Drag and drop mechanics for cat care stations
+- Pixel arts and animation
 
 ### 📅 Planned
 
-- Main game mechanics to care for the virtual cat (feeding, grooming, etc.)
-- Cat animations
+- Multiple care stations (feeding, bathing, play area, health check) and their minigames
+- Progression system and gameplay loop (shelter upgrades, more care options, fail point, etc.)
 
 ### 🔄 Continuous Improvements
 
-- Find and fix bugs, UI/UX improvements to ensure smooth user usage
+- Find and fix bugs, UI/UX improvements to ensure smooth user experience
+
+## 🎮 Gameplay
+
+Run your own cat shelter by:
+
+- Taking in cats with various needs and personalities
+- Caring for them at different stations (feeding, grooming, playtime)
+- Preparing them for adoption
+- Finding them loving forever homes
+- Expanding your shelter to help more cats
 
 ## 🛠️ Technologies
 
@@ -31,20 +42,23 @@ This project is under active development. Here's the current status of features:
 - TypeScript
 - SCSS
 - @ng-icons library
+- Node.js + Express backend
+- MongoDB database
 
 ## 📋 Prerequisites
 
 - Node.js (LTS version recommended)
 - npm (comes with Node.js)
 - Angular CLI (`npm install -g @angular/cli`)
+- MongoDB (local or Atlas connection)
 
 ## 🔧 Installation
 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/virtual-cat.git
-cd virtual-cat
+git clone https://github.com/your-username/cat-shelter-simulator.git
+cd cat-shelter-simulator
 ```
 
 2. Install dependencies:
@@ -63,6 +77,8 @@ ng serve
 
 ## 📖 Usage
 
-- Register or log in to your account.
-- Take care of your cat by feeding, playing, and grooming it.
-- Enjoy watching your cat grow and thrive!
+- Register or log in to your account
+- Manage incoming cats at your shelter
+- Drag cats to different care stations and pass the minigames
+- Put cats up for adoption to gain income for the shelter
+- Upgrade your shelter to accommodate more cats and provide better care
