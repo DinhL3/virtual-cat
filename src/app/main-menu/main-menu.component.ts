@@ -4,10 +4,12 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { GameService } from '../services/game.service';
 import { catchError, finalize, of } from 'rxjs';
+import { Dialog, DialogModule } from '@angular/cdk/dialog';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-main-menu',
-  imports: [CommonModule],
+  imports: [CommonModule, DialogModule],
   templateUrl: './main-menu.component.html',
   styleUrl: './main-menu.component.scss',
   standalone: true,
@@ -23,6 +25,7 @@ export class MainMenuComponent implements OnInit {
     private auth: AuthService,
     private gameService: GameService,
     private router: Router,
+    private dialog: Dialog,
   ) {}
 
   ngOnInit() {
@@ -66,7 +69,28 @@ export class MainMenuComponent implements OnInit {
   }
 
   onNewGame() {
-    this.router.navigate(['/new-game']);
+    // If there's an existing save, show the confirmation dialog
+    if (this.hasGameSaves) {
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        data: {
+          title: 'Start New Game',
+          message:
+            'You have an existing save. Starting a new game will overwrite your current progress. Are you sure you want to continue?',
+          confirmButtonText: 'Yes, Start New Game',
+          cancelButtonText: 'No, Keep My Save',
+        },
+        ariaLabel: 'Confirm starting new game',
+      });
+
+      dialogRef.closed.subscribe((result) => {
+        if (result === true) {
+          this.router.navigate(['/new-game']);
+        }
+      });
+    } else {
+      // If no existing save, navigate directly
+      this.router.navigate(['/new-game']);
+    }
   }
 
   onResumeGame() {

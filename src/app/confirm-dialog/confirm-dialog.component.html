@@ -1,0 +1,12 @@
+<div class="card bg-light-yellow">
+  <h2 class="dialog-title text-primary">{{ data.title }}</h2>
+  <p class="dialog-message text-primary">{{ data.message }}</p>
+  <div class="dialog-actions">
+    <button class="button filled primary" (click)="close(true)">
+      {{ data.confirmButtonText }}
+    </button>
+    <button class="button outlined secondary" (click)="close(false)">
+      {{ data.cancelButtonText }}
+    </button>
+  </div>
+</div>
