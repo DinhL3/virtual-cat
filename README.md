@@ -2,6 +2,9 @@
 
 A shelter management game built with Angular where you run your own cat shelter and prepare feline friends for their forever homes.
 
+![Main menu](https://res.cloudinary.com/doeoghxhd/image/upload/v1744299599/virtual-cat/login.jpg)
+![Login](https://res.cloudinary.com/doeoghxhd/image/upload/v1744299599/virtual-cat/main-menu.jpg)
+
 ## Features
 
 This project is under active development. Here's the current status of features:
