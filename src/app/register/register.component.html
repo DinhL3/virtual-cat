@@ -1,6 +1,6 @@
 <div class="card bg-light-yellow">
-  <ng-icon name="gameCat" size="32px"></ng-icon>
-  <h2>Create an account</h2>
+  <ng-icon class="text-primary" name="gameCat" size="32px"></ng-icon>
+  <h2 class="text-primary">Create an account</h2>
   <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="login-form">
     <div class="form-group">
       <label for="username">Username</label>
@@ -54,7 +54,7 @@
     <p class="error-message">{{ errorMessage }}</p>
   }
   <h4>
-    <span>Already have an account? </span>
+    <span class="text-primary">Already have an account? </span>
     <a routerLink="/login">Sign in</a>
   </h4>
 </div>
