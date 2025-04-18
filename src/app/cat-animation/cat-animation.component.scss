@@ -1,0 +1,14 @@
+.cat-container {
+  position: relative;
+  width: 96px; // Adjust based on your sprite size
+  height: 96px; // Adjust based on your sprite size
+  overflow: hidden;
+}
+
+.cat-sprite {
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated; // Keeps pixel art crisp
+  image-rendering: crisp-edges; // Firefox equivalent
+}
