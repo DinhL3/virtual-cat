@@ -73,6 +73,18 @@ export class CatAnimationComponent implements OnInit, OnDestroy, AfterViewInit {
       frames: 30,
       duration: 3000,
     },
+    {
+      name: 'groom-head',
+      row: 3,
+      frames: 12,
+      duration: 1200,
+    },
+    {
+      name: 'groom-body',
+      row: 4,
+      frames: 17,
+      duration: 1700,
+    },
   ];
 
   // Animation state
