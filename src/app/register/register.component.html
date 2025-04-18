@@ -1,6 +1,6 @@
 <div class="card bg-light-yellow">
   <div class="vertical-stack">
-    <app-cat-animation></app-cat-animation>
+    <app-cat-animation [scale]="0.75"></app-cat-animation>
     <h2 class="text-primary">Create an account</h2>
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="login-form">
       <div class="form-group">

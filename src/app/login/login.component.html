@@ -1,6 +1,6 @@
 <div class="card bg-light-yellow">
   <div class="vertical-stack">
-    <app-cat-animation></app-cat-animation>
+    <app-cat-animation [scale]="0.75"></app-cat-animation>
     <h2 class="text-primary">Log in to Virtual Cat</h2>
     <!-- Bind to loginForm -->
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
