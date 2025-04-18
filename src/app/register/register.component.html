@@ -1,60 +1,62 @@
 <div class="card bg-light-yellow">
-  <ng-icon class="text-primary" name="gameCat" size="32px"></ng-icon>
-  <h2 class="text-primary">Create an account</h2>
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="login-form">
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input
-        type="text"
-        id="username"
-        formControlName="username"
-        class="form-control"
-        [class.error]="username?.invalid && username?.touched"
-      />
-      <div class="error-message">
-        @if (username?.invalid && username?.touched) {
-          @if (username?.errors?.['required']) {
-            <span>Username is required</span>
+  <div class="vertical-stack">
+    <app-cat-animation></app-cat-animation>
+    <h2 class="text-primary">Create an account</h2>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          class="form-control"
+          [class.error]="username?.invalid && username?.touched"
+        />
+        <div class="error-message">
+          @if (username?.invalid && username?.touched) {
+            @if (username?.errors?.['required']) {
+              <span>Username is required</span>
+            }
+            @if (username?.errors?.['minlength']) {
+              <span>Username must be at least 4 characters</span>
+            }
           }
-          @if (username?.errors?.['minlength']) {
-            <span>Username must be at least 4 characters</span>
-          }
-        }
+        </div>
       </div>
-    </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input
-        type="password"
-        id="password"
-        formControlName="password"
-        class="form-control"
-        [class.error]="password?.invalid && password?.touched"
-      />
-      <div class="error-message">
-        @if (password?.invalid && password?.touched) {
-          @if (password?.errors?.['required']) {
-            <span>Password is required</span>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          [class.error]="password?.invalid && password?.touched"
+        />
+        <div class="error-message">
+          @if (password?.invalid && password?.touched) {
+            @if (password?.errors?.['required']) {
+              <span>Password is required</span>
+            }
+            @if (password?.errors?.['minlength']) {
+              <span>Password must be at least 6 characters</span>
+            }
           }
-          @if (password?.errors?.['minlength']) {
-            <span>Password must be at least 6 characters</span>
-          }
-        }
+        </div>
       </div>
-    </div>
-    <button
-      type="submit"
-      class="button filled secondary"
-      [disabled]="registerForm.invalid || loading"
-    >
-      {{ loading ? 'Registering...' : 'Register' }}
-    </button>
-  </form>
-  @if (errorMessage) {
-    <p class="error-message">{{ errorMessage }}</p>
-  }
-  <h4>
-    <span class="text-primary">Already have an account? </span>
-    <a routerLink="/login">Sign in</a>
-  </h4>
+      <button
+        type="submit"
+        class="button filled secondary"
+        [disabled]="registerForm.invalid || loading"
+      >
+        {{ loading ? 'Registering...' : 'Register' }}
+      </button>
+    </form>
+    @if (errorMessage) {
+      <p class="error-message">{{ errorMessage }}</p>
+    }
+    <h4>
+      <span class="text-primary">Already have an account? </span>
+      <a routerLink="/login">Sign in</a>
+    </h4>
+  </div>
 </div>

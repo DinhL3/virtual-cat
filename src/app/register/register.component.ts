@@ -1,8 +1,6 @@
 // register.component.ts
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { NgIcon, provideIcons } from '@ng-icons/core';
-import { gameCat } from '@ng-icons/game-icons';
 import {
   FormBuilder,
   FormGroup,
@@ -11,14 +9,19 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
+import { CatAnimationComponent } from '../cat-animation/cat-animation.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [RouterLink, NgIcon, ReactiveFormsModule, CommonModule],
+  imports: [
+    RouterLink,
+    ReactiveFormsModule,
+    CommonModule,
+    CatAnimationComponent,
+  ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
-  viewProviders: [provideIcons({ gameCat })],
 })
 export class RegisterComponent {
   registerForm: FormGroup;

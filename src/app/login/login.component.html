@@ -1,49 +1,51 @@
 <div class="card bg-light-yellow">
-  <ng-icon name="gameCat" size="32px" class="text-primary"></ng-icon>
-  <h2 class="text-primary">Log in to Virtual Cat</h2>
-  <!-- Bind to loginForm -->
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-    <div class="form-group">
-      <label for="username">Username</label>
-      <!-- formControlName="username" -->
-      <input
-        type="text"
-        id="username"
-        class="form-control"
-        formControlName="username"
-      />
-    </div>
+  <div class="vertical-stack">
+    <app-cat-animation></app-cat-animation>
+    <h2 class="text-primary">Log in to Virtual Cat</h2>
+    <!-- Bind to loginForm -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <!-- formControlName="username" -->
+        <input
+          type="text"
+          id="username"
+          class="form-control"
+          formControlName="username"
+        />
+      </div>
 
-    <div class="form-group">
-      <label for="password">Password</label>
-      <!-- formControlName="password" -->
-      <input
-        type="password"
-        id="password"
-        class="form-control"
-        formControlName="password"
-      />
-    </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <!-- formControlName="password" -->
+        <input
+          type="password"
+          id="password"
+          class="form-control"
+          formControlName="password"
+        />
+      </div>
 
-    <button
-      type="submit"
-      class="button filled primary"
-      [disabled]="loginForm.invalid || loading"
-    >
-      @if (loading) {
-        <div>Logging in...</div>
-      } @else {
-        <div>Log In</div>
-      }
-    </button>
-  </form>
+      <button
+        type="submit"
+        class="button filled primary"
+        [disabled]="loginForm.invalid || loading"
+      >
+        @if (loading) {
+          <div>Logging in...</div>
+        } @else {
+          <div>Log In</div>
+        }
+      </button>
+    </form>
 
-  <!-- Display an error if login fails -->
-  @if (errorMessage) {
-    <p class="error-message">{{ errorMessage }}</p>
-  }
-  <h4>
-    <span class="text-primary">Don't have an account? </span>
-    <a routerLink="/register">Sign up</a>
-  </h4>
+    <!-- Display an error if login fails -->
+    @if (errorMessage) {
+      <p class="error-message">{{ errorMessage }}</p>
+    }
+    <h4>
+      <span class="text-primary">Don't have an account? </span>
+      <a routerLink="/register">Sign up</a>
+    </h4>
+  </div>
 </div>
