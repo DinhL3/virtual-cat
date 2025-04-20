@@ -7,6 +7,9 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   if (!auth.isLoggedIn()) {
+    // If token is expired, the isLoggedIn() will return false
+    // We should explicitly log the user out to clear any stale data
+    auth.logout();
     router.navigate(['/welcome']);
     return false;
   }

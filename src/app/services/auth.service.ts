@@ -1,4 +1,3 @@
-// src/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
@@ -102,10 +101,32 @@ export class AuthService {
     this.currentUser = null;
   }
 
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
+
+    try {
+      // JWT tokens are base64 encoded with 3 parts: header.payload.signature
+      const payload = token.split('.')[1];
+      const decodedPayload = JSON.parse(atob(payload));
+
+      // Check if exp (expiration timestamp) exists and is valid
+      if (!decodedPayload.exp) return false;
+
+      // Compare expiration timestamp with current time (in seconds)
+      const expiry = decodedPayload.exp * 1000; // Convert to milliseconds
+      return expiry < Date.now();
+    } catch (e) {
+      // If token can't be parsed, consider it expired
+      console.error('Error parsing JWT token:', e);
+      return true;
+    }
+  }
+
   isLoggedIn(): boolean {
     const token = this.getToken();
     const user = this.getUser();
-    return !!(token && user);
+    return !!(token && user && !this.isTokenExpired());
   }
 
   refreshUserData(): Observable<User> {
