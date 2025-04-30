@@ -18,7 +18,30 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./cat-animation.component.scss'],
 })
 export class CatAnimationComponent implements OnInit, OnDestroy, AfterViewInit {
+  // Input properties
+  @Input() scale = 1;
+
+  // View references
   @ViewChild('catCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
+
+  // Host bindings for layout
+  @HostBinding('style.width.px') get hostW() {
+    return Math.round(this.frameWidth * this.scale);
+  }
+  @HostBinding('style.height.px') get hostH() {
+    return Math.round(this.frameHeight * this.scale);
+  }
+  @HostBinding('style.flex') hostFlex = '0 0 auto';
+
+  // Canvas properties
+  get canvasWidth(): number {
+    return this.frameWidth;
+  }
+  get canvasHeight(): number {
+    return this.frameHeight;
+  }
+
+  // Private properties
   private ctx!: CanvasRenderingContext2D;
   private spriteImage = new Image();
   private isImageLoaded = false;
@@ -27,64 +50,16 @@ export class CatAnimationComponent implements OnInit, OnDestroy, AfterViewInit {
   private frameWidth = 96;
   private frameHeight = 96;
 
-  // Canvas dimensions (always use integer sizes)
-  get canvasWidth(): number {
-    return this.frameWidth;
-  }
-
-  get canvasHeight(): number {
-    return this.frameHeight;
-  }
-
-  // Host bindings for proper layout
-  @HostBinding('style.width.px') get hostW() {
-    return Math.round(this.frameWidth * this.scale);
-  }
-
-  @HostBinding('style.height.px') get hostH() {
-    return Math.round(this.frameHeight * this.scale);
-  }
-
-  @HostBinding('style.flex') hostFlex = '0 0 auto';
-
-  // Input properties
-  @Input() scale = 1;
-
   // Spritesheet path
-  private spritesheet = './assets/sprites/cats/orange-cat-sit-idle.png';
+  private spritesheet = './assets/sprites/cats/orange-cat-old.png';
 
   // Animation configuration
   private animations = [
-    {
-      name: 'blink',
-      row: 0,
-      frames: 4,
-      duration: 400,
-    },
-    {
-      name: 'tail-whip',
-      row: 1,
-      frames: 6,
-      duration: 600,
-    },
-    {
-      name: 'look-left',
-      row: 2,
-      frames: 30,
-      duration: 3000,
-    },
-    {
-      name: 'groom-head',
-      row: 3,
-      frames: 12,
-      duration: 1200,
-    },
-    {
-      name: 'groom-body',
-      row: 4,
-      frames: 17,
-      duration: 1700,
-    },
+    { name: 'blink', row: 0, frames: 4, duration: 400 },
+    { name: 'tail-whip', row: 1, frames: 6, duration: 600 },
+    { name: 'look-left', row: 2, frames: 30, duration: 3000 },
+    { name: 'groom-head', row: 3, frames: 12, duration: 1200 },
+    { name: 'groom-body', row: 4, frames: 17, duration: 1700 },
   ];
 
   // Animation state
@@ -108,6 +83,7 @@ export class CatAnimationComponent implements OnInit, OnDestroy, AfterViewInit {
     };
   }
 
+  // Lifecycle hooks
   ngOnInit(): void {
     this.startIdleTimer();
   }
@@ -129,6 +105,7 @@ export class CatAnimationComponent implements OnInit, OnDestroy, AfterViewInit {
     this.clearTimers();
   }
 
+  // Private methods
   private startIdleTimer(): void {
     // Clear any existing timers
     this.clearTimers();
