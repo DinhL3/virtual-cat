@@ -1,50 +1,62 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, inject, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { GameService } from '../services/game.service';
+import { CanvasComponent } from './canvas/canvas.component';
+
+interface GameState {
+  currentDay: number;
+  money: number;
+}
+
+interface GameSave {
+  gameState: GameState;
+}
 
 @Component({
   selector: 'app-game',
+  standalone: true,
+  imports: [CommonModule, CanvasComponent],
   templateUrl: './game.component.html',
-  styleUrls: ['./game.component.scss'],
+  styleUrl: './game.component.scss',
 })
-export class GameComponent implements OnInit {
-  isLoading = true;
-  gameSave: any = null;
-  errorMessage: string | null = null;
+export class GameComponent {
+  private router = inject(Router);
+  private gameService = inject(GameService);
 
-  constructor(
-    private gameService: GameService,
-    private route: ActivatedRoute,
-    private router: Router,
-  ) {}
+  // Reactive state using signals
+  protected isLoading = signal(true);
+  protected errorMessage = signal<string | null>(null);
+  protected gameSave = signal<GameSave | null>(null);
 
-  ngOnInit(): void {
-    // First, always attempt to load the game directly
+  // Computed values
+  protected showGame = computed(
+    () => !this.isLoading() && !this.errorMessage() && this.gameSave(),
+  );
+
+  constructor() {
+    // Load game on component creation
     this.loadGameSave();
-
-    // 1. If coming from new game, the save will exist
-    // 2. If trying to resume but no save exists, the loadGame() API will return an appropriate error
-    // 3. We can handle that error in the loadGameSave() method
   }
 
-  private loadGameSave(): void {
-    this.gameService.loadGame().subscribe({
-      next: (response) => {
-        this.gameSave = response.gameSave;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.isLoading = false;
+  private async loadGameSave(): Promise<void> {
+    try {
+      const response = await this.gameService.loadGame().toPromise();
+      if (response) {
+        this.gameSave.set(response.gameSave);
+      }
+      this.isLoading.set(false);
+    } catch (error: any) {
+      this.isLoading.set(false);
 
-        // If error is due to no save found, redirect to new game
-        if (error.status === 404) {
-          this.router.navigate(['/new-game']);
-        } else {
-          this.errorMessage =
-            'Failed to load game: ' + (error.message || 'Unknown error');
-          console.error('Error loading game save:', error);
-        }
-      },
-    });
+      if (error.status === 404) {
+        await this.router.navigate(['/new-game']);
+      } else {
+        this.errorMessage.set(
+          'Failed to load game: ' + (error.message || 'Unknown error'),
+        );
+        console.error('Error loading game save:', error);
+      }
+    }
   }
 }

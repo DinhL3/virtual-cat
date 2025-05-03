@@ -1,29 +1,27 @@
-<div class="game-container bg-light-yellow">
-  @if (errorMessage) {
+<div class="game-container">
+  @if (errorMessage()) {
     <div class="error-container">
       <div class="error-message">
-        {{ errorMessage }}
+        {{ errorMessage() }}
       </div>
     </div>
-  } @else if (isLoading) {
+  } @else if (isLoading()) {
     <div class="loading-container">
       <div class="loading-spinner">
         <h2>Loading game...</h2>
       </div>
     </div>
-  } @else {
-    @if (gameSave) {
-      <div class="header bg-salmon">
-        <div class="header__day bg-light-orange">
-          Day: {{ gameSave.gameState.currentDay }}
-        </div>
-        <div class="header__money bg-light-orange">
-          Money: {{ gameSave.gameState.money }}
-        </div>
+  } @else if (gameSave()) {
+    <div class="header bg-salmon">
+      <div class="header__day bg-light-yellow">
+        Day: {{ gameSave()!.gameState.currentDay }}
       </div>
-      <div class="game-area">
-        <!-- Game content here -->
+      <div class="header__money bg-light-yellow">
+        Money: {{ gameSave()!.gameState.money }}
       </div>
-    }
+    </div>
+    <div class="game-area">
+      <app-canvas />
+    </div>
   }
 </div>

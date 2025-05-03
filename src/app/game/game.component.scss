@@ -1,21 +1,12 @@
 .game-container {
   width: 800px;
-  height: 600px;
   position: relative;
 
-  // Standard game layout with grid
-  display: grid;
-  grid-template-rows: 60px 1fr;
-  grid-template-areas:
-    'header'
-    'game-area';
-
   .header {
-    grid-area: header;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 16px;
+    padding: 8px 16px;
 
     &__day,
     &__money {
@@ -23,11 +14,6 @@
       padding: 8px;
     }
   }
-
-  .game-area {
-    grid-area: game-area;
-  }
-
   // Center loading and error containers
   .loading-container,
   .error-container {
