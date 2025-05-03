@@ -3,7 +3,7 @@ import {
   AnimatedSprite,
   CatState,
   CatSitAnimation,
-  AnimationName,
+  AnimationName, // Ensure AnimationName is imported if needed, though not directly used in logic here
 } from './canvas.types';
 import {
   WALK_SPEED,
@@ -13,9 +13,10 @@ import {
   FRAME_COUNTS,
 } from './canvas.config';
 
+// Interface remains the same
 export interface CatUpdateResult {
   nextState?: CatState;
-  updatedCat?: Partial<AnimatedSprite>; // Only include changed properties
+  updatedCat?: Partial<AnimatedSprite>;
   nextSitStartTime?: number;
 }
 
@@ -37,8 +38,16 @@ export class CatBehaviorService {
     const currentAnimationDef = currentCat.animations.get(
       currentCat.currentAnimation,
     );
-    if (!currentAnimationDef) return {}; // Should not happen if assets loaded correctly
 
+    // Add a check for DRAGGED state early, as it bypasses normal animation logic
+    // Also check if currentAnimationDef exists to prevent errors
+    if (!currentAnimationDef || currentState === CatState.DRAGGED) {
+      // If dragged, the component handles position and state transitions.
+      // No state transitions or property updates initiated from this service while DRAGGED.
+      return {}; // Return empty result
+    }
+
+    // Proceed with normal state logic only if not DRAGGED
     switch (currentState) {
       case CatState.WALKING_TO_SPOT:
         if (currentCat.x > CAT_TARGET_X) {
@@ -123,6 +132,8 @@ export class CatBehaviorService {
           }
         }
         break;
+
+      // NOTE: No DRAGGED case needed here as it's handled by the early return check
     }
 
     if (catPropsChanged) {

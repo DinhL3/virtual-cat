@@ -35,6 +35,7 @@ export enum CatState {
   WALKING_TO_SPOT,
   SITTING_AT_SPOT,
   ANIMATING_AT_SPOT,
+  DRAGGED,
 }
 
 export enum CatSitAnimation {

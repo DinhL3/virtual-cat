@@ -1,3 +1,4 @@
+// src/app/canvas/canvas.component.ts
 import {
   AfterViewInit,
   Component,
@@ -8,14 +9,26 @@ import {
   DestroyRef,
   inject,
   ChangeDetectionStrategy,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // Import types, config, and services
-import { AnimatedSprite, CatState, GameSprite } from './canvas.types';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, MAX_DELTA_TIME } from './canvas.config';
+import {
+  AnimatedSprite,
+  CatState,
+  GameSprite,
+  AnimationName, // <-- Import AnimationName
+} from './canvas.types';
+import {
+  CANVAS_WIDTH,
+  CANVAS_HEIGHT,
+  MAX_DELTA_TIME,
+  CAT_TARGET_X, // <-- Import target position
+  CAT_SITTING_Y, // <-- Import target position
+} from './canvas.config';
 import { AssetLoaderService } from './asset-loader.service';
-import { CatBehaviorService, CatUpdateResult } from './cat-behavior.service';
+import { CatBehaviorService } from './cat-behavior.service'; // Service signature doesn't change
 
 @Component({
   selector: 'app-canvas',
@@ -27,6 +40,7 @@ import { CatBehaviorService, CatUpdateResult } from './cat-behavior.service';
       [attr.width]="canvasWidth"
       [attr.height]="canvasHeight"
       [class]="canvasClass()"
+      style="touch-action: none;"
     ></canvas>
   `,
   styles: [
@@ -47,6 +61,9 @@ import { CatBehaviorService, CatUpdateResult } from './cat-behavior.service';
       .cursor-default {
         cursor: default;
       }
+      .cursor-grabbing {
+        cursor: grabbing;
+      } /* Add grabbing cursor style */
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush, // Suitable for canvas updates
@@ -64,17 +81,23 @@ export class CanvasComponent implements AfterViewInit {
   protected readonly canvasWidth = CANVAS_WIDTH;
   protected readonly canvasHeight = CANVAS_HEIGHT;
 
-  // Game state signals
+  // --- Game state signals ---
   private isLoading = signal(true);
   private sprites = signal<Map<string, GameSprite>>(new Map());
   private cat = signal<AnimatedSprite | null>(null);
   private catState = signal<CatState>(CatState.WALKING_TO_SPOT);
   private lastSitStartTime = signal<number>(0);
 
+  // --- Dragging State ---
+  private isDragging = signal(false);
+  private dragOffsetX = signal(0); // Offset from cat's top-left to mouse click point
+  private dragOffsetY = signal(0);
+
   // Computed values
   protected canvasClass = computed(() => ({
     'cursor-wait': this.isLoading(),
-    'cursor-default': !this.isLoading(),
+    'cursor-default': !this.isLoading() && !this.isDragging(), // Default when not loading or dragging
+    'cursor-grabbing': this.isDragging(), // Grabbing cursor when dragging
   }));
 
   private animationFrameId?: number;
@@ -117,7 +140,7 @@ export class CanvasComponent implements AfterViewInit {
       // Clamp delta time to prevent large jumps if the tab was inactive
       const clampedDeltaTime = Math.min(deltaTime, MAX_DELTA_TIME);
 
-      this.update(clampedDeltaTime, timestamp);
+      this.update(clampedDeltaTime, timestamp); // Pass timestamp
       this.draw();
 
       this.animationFrameId = requestAnimationFrame(gameLoop);
@@ -135,8 +158,10 @@ export class CanvasComponent implements AfterViewInit {
   }
 
   private update(deltaTime: number, timestamp: number): void {
+    // Accept timestamp
     const currentCat = this.cat();
-    if (!currentCat || this.isLoading()) return; // Don't update if no cat or still loading
+    // Don't update cat behavior via service if dragging or loading
+    if (!currentCat || this.isLoading() || this.isDragging()) return;
 
     const currentState = this.catState();
     const currentSitStartTime = this.lastSitStartTime();
@@ -146,7 +171,7 @@ export class CanvasComponent implements AfterViewInit {
       currentCat,
       currentState,
       currentSitStartTime,
-      timestamp,
+      timestamp, // Pass timestamp to service
     );
 
     // Apply updates returned by the service
@@ -206,5 +231,109 @@ export class CanvasComponent implements AfterViewInit {
       cat.width,
       cat.height,
     );
+  }
+
+  // --- Mouse Event Handlers ---
+
+  @HostListener('window:mouseup', ['$event'])
+  onMouseUp(event: MouseEvent): void {
+    if (this.isDragging()) {
+      this.isDragging.set(false);
+      const currentTimestamp = performance.now(); // Get current time for reset
+
+      // Reset cat to sitting spot and state
+      this.cat.update((cat) => {
+        if (!cat) return null;
+        return {
+          ...cat,
+          x: CAT_TARGET_X, // Snap back to target X
+          y: CAT_SITTING_Y, // Snap back to target Y
+          currentAnimation: 'sit-blink', // Back to base sit pose
+          currentFrame: 0,
+          lastFrameTime: currentTimestamp, // Reset frame time
+        };
+      });
+      this.catState.set(CatState.SITTING_AT_SPOT); // Go back to sitting state
+      this.lastSitStartTime.set(currentTimestamp); // Start the pause timer
+    }
+  }
+
+  @HostListener('window:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent): void {
+    if (!this.isDragging()) return;
+
+    const cat = this.cat();
+    if (!cat) return; // Should not happen if dragging is true
+
+    const { mouseX, mouseY } = this.getMousePos(event);
+    const newX = mouseX - this.dragOffsetX();
+    const newY = mouseY - this.dragOffsetY();
+
+    // Update cat position directly - ensure animation remains 'carried'
+    this.cat.update((c) =>
+      c
+        ? {
+            ...c,
+            x: newX,
+            y: newY,
+            currentAnimation: 'carried', // Ensure animation is correct
+            currentFrame: 0, // 'carried' only has one frame
+          }
+        : null,
+    );
+  }
+
+  // Use HostListener on the canvas itself for mousedown to ensure the click starts within the canvas
+  @HostListener('mousedown', ['$event'])
+  onMouseDown(event: MouseEvent): void {
+    if (this.isLoading() || this.isDragging()) return; // Don't start drag if loading or already dragging
+
+    const currentCat = this.cat();
+    const currentState = this.catState();
+    if (!currentCat) return;
+
+    // Allow dragging only when sitting or doing a sit animation
+    const canDrag =
+      currentState === CatState.SITTING_AT_SPOT ||
+      currentState === CatState.ANIMATING_AT_SPOT;
+    if (!canDrag) return;
+
+    const { mouseX, mouseY } = this.getMousePos(event);
+
+    // Hit test: Check if the click is within the cat's bounds
+    if (
+      mouseX >= currentCat.x &&
+      mouseX <= currentCat.x + currentCat.width &&
+      mouseY >= currentCat.y &&
+      mouseY <= currentCat.y + currentCat.height
+    ) {
+      event.preventDefault(); // Prevent text selection/default drag behavior
+
+      this.isDragging.set(true);
+      this.dragOffsetX.set(mouseX - currentCat.x);
+      this.dragOffsetY.set(mouseY - currentCat.y);
+
+      // Immediately switch state and animation
+      this.catState.set(CatState.DRAGGED);
+      this.cat.update((cat) =>
+        cat
+          ? {
+              ...cat,
+              currentAnimation: 'carried', // Switch to carried animation
+              currentFrame: 0, // Reset frame for carried animation
+            }
+          : null,
+      );
+    }
+  }
+
+  // Helper to get mouse coordinates relative to the canvas
+  private getMousePos(event: MouseEvent): { mouseX: number; mouseY: number } {
+    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
+    const scaleX = this.canvasRef.nativeElement.width / rect.width; // Handle CSS scaling
+    const scaleY = this.canvasRef.nativeElement.height / rect.height;
+    const mouseX = (event.clientX - rect.left) * scaleX;
+    const mouseY = (event.clientY - rect.top) * scaleY;
+    return { mouseX, mouseY };
   }
 }
