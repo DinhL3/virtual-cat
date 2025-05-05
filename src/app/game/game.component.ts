@@ -1,8 +1,19 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  computed,
+  HostListener,
+  ElementRef,
+  ViewChild,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { GameService } from '../services/game.service';
+import { AuthService } from '../services/auth.service'; // Import AuthService
 import { CanvasComponent } from './canvas/canvas.component';
+import { firstValueFrom } from 'rxjs'; // Import if using RxJS >= 7 for async conversion
 
 interface GameState {
   currentDay: number;
@@ -19,41 +30,98 @@ interface GameSave {
   imports: [CommonModule, CanvasComponent],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
+  // changeDetection: ChangeDetectionStrategy.OnPush, // Optional strategy
 })
 export class GameComponent {
+  // --- Injected Services ---
   private router = inject(Router);
   private gameService = inject(GameService);
+  private auth = inject(AuthService); // Inject AuthService
+  private elementRef = inject(ElementRef);
 
-  // Reactive state using signals
+  // --- State Signals ---
   protected isLoading = signal(true);
   protected errorMessage = signal<string | null>(null);
   protected gameSave = signal<GameSave | null>(null);
+  protected isMenuOpen = signal(false);
 
-  // Computed values
+  // --- Template References ---
+  @ViewChild('burgerButton', { static: false })
+  burgerButtonRef?: ElementRef<HTMLButtonElement>;
+  @ViewChild('burgerMenu', { static: false })
+  burgerMenuRef?: ElementRef<HTMLDivElement>;
+
+  // --- Computed Values ---
   protected showGame = computed(
     () => !this.isLoading() && !this.errorMessage() && this.gameSave(),
   );
 
   constructor() {
-    // Load game on component creation
     this.loadGameSave();
   }
 
+  // --- Menu Logic ---
+  toggleMenu(): void {
+    this.isMenuOpen.update((open) => !open);
+  }
+
+  closeMenu(): void {
+    this.isMenuOpen.set(false);
+  }
+
+  async returnToMainMenu(): Promise<void> {
+    this.closeMenu();
+    await this.router.navigate(['/main-menu']); // Navigate to main menu
+  }
+
+  async logout(): Promise<void> {
+    this.closeMenu();
+    this.auth.logout(); // Call AuthService logout
+    await this.router.navigate(['/welcome']); // Navigate to welcome screen
+  }
+
+  // --- Host Listener for Outside Clicks ---
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.isMenuOpen()) {
+      return;
+    }
+    const target = event.target as Node;
+    if (!target) {
+      return;
+    }
+    const clickedOnButton =
+      this.burgerButtonRef?.nativeElement.contains(target);
+    const clickedInsideMenu =
+      this.burgerMenuRef?.nativeElement.contains(target);
+
+    if (!clickedOnButton && !clickedInsideMenu) {
+      this.closeMenu();
+    }
+  }
+
+  // --- Data Loading ---
   private async loadGameSave(): Promise<void> {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
     try {
-      const response = await this.gameService.loadGame().toPromise();
-      if (response) {
+      // Assuming gameService.loadGame() returns an Observable
+      const response = await firstValueFrom(this.gameService.loadGame());
+
+      if (response && response.gameSave) {
         this.gameSave.set(response.gameSave);
+      } else {
+        console.warn('Game data not found in response.');
+        await this.router.navigate(['/new-game']);
       }
       this.isLoading.set(false);
     } catch (error: any) {
       this.isLoading.set(false);
-
       if (error.status === 404) {
         await this.router.navigate(['/new-game']);
       } else {
         this.errorMessage.set(
-          'Failed to load game: ' + (error.message || 'Unknown error'),
+          'Failed to load game: ' + (error.message || 'Unknown server error'),
         );
         console.error('Error loading game save:', error);
       }

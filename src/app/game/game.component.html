@@ -16,9 +16,32 @@
       <div class="header__day bg-light-yellow">
         Day: {{ gameSave()!.gameState.currentDay }}
       </div>
-      <button class="burger-button" aria-label="Open menu">
+
+      <button
+        #burgerButton
+        class="burger-button"
+        aria-label="Open menu"
+        [attr.aria-expanded]="isMenuOpen()"
+        (click)="toggleMenu()"
+      >
         <img src="assets/ui/burger-menu-light-yellow.png" alt="Menu" />
       </button>
+
+      @if (isMenuOpen()) {
+        <div #burgerMenu class="burger-menu" role="menu">
+          <button
+            class="burger-menu__item"
+            role="menuitem"
+            (click)="returnToMainMenu()"
+          >
+            Return to Main Menu
+          </button>
+          <button class="burger-menu__item" role="menuitem" (click)="logout()">
+            Log out
+          </button>
+        </div>
+      }
+
       <div class="header__money bg-light-yellow">
         Money: {{ gameSave()!.gameState.money }}
       </div>

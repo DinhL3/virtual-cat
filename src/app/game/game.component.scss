@@ -22,18 +22,57 @@
       border: none;
       cursor: pointer;
       padding: 0;
+      // make burger button center on header, ignoring flex properties of parents
       position: absolute;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
+      z-index: 11; // Ensure button is above other header items if needed
 
       img {
         width: 24px;
         height: 24px;
+        display: block; // Prevent extra space below image
+      }
+    }
+
+    // floating open menu styles
+    .burger-menu {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translateX(-50%);
+      margin-top: 16px; // Push it down below the button (adjust as needed)
+
+      background-color: $color-light-yellow;
+      border-radius: 6px;
+      padding: 8px 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      z-index: 20;
+      // min-width: 180px;
+
+      &__item {
         display: block;
+        width: 100%;
+        background: none;
+        border: none;
+        padding: 8px 16px;
+        text-align: left;
+        color: $color-dark-blue;
+        cursor: pointer;
+        white-space: nowrap;
+
+        &:hover {
+          background-color: $color-light-orange;
+        }
+
+        // &:not(:last-child) {
+        //   border-bottom: 1px solid $color-light-orange; // Separator line
+        // }
       }
     }
   }
+
   // Center loading and error containers
   .loading-container,
   .error-container {
@@ -45,6 +84,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 10;
+    z-index: 30; // Ensure loading/error are above everything
+    color: $color-dark-blue;
   }
 }
