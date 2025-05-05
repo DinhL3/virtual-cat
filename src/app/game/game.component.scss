@@ -1,3 +1,5 @@
+@use '../../styles/variables' as *;
+
 .game-container {
   width: 800px;
   position: relative;
@@ -7,11 +9,29 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 16px;
+    position: relative;
 
     &__day,
     &__money {
       border-radius: 8px;
       padding: 8px;
+    }
+
+    .burger-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+
+      img {
+        width: 24px;
+        height: 24px;
+        display: block;
+      }
     }
   }
   // Center loading and error containers
