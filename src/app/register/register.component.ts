@@ -1,4 +1,3 @@
-// register.component.ts
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import {
