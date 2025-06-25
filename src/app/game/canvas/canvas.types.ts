@@ -1,10 +1,14 @@
-export type AnimationName =
+export type CatAnimationName =
   | 'walk-left'
   | 'sit-blink'
   | 'sit-tail-whip'
   | 'sit-groom-paw'
   | 'walk-right'
   | 'carried';
+
+export type TubAnimationName = 'tub-empty' | 'tub-filled';
+
+export type AnimationName = CatAnimationName | TubAnimationName;
 
 export interface SpriteFrame {
   x: number;
@@ -52,8 +56,19 @@ export interface GameSprite {
   height: number;
 }
 
+// Static Sprite Configuration Interface
+export interface StaticSpriteConfig {
+  readonly id: string;
+  readonly src: string;
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
 // Optional: Define a structure for loaded assets if needed by the component
 export interface LoadedAssets {
   staticSprites: Map<string, GameSprite>;
   cat: AnimatedSprite;
+  tub: AnimatedSprite;
 }

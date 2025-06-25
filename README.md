@@ -46,7 +46,7 @@ Run your own cat shelter by:
 
 ## 📋 Prerequisites
 
-- Node.js (LTS version recommended)
+- Node.js v22 (LTS) recommended
 - npm (comes with Node.js)
 - Angular CLI (`npm install -g @angular/cli`)
 - MongoDB (local or Atlas connection)

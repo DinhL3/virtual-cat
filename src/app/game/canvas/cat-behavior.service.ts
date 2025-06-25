@@ -10,7 +10,7 @@ import {
   CAT_TARGET_X,
   CAT_SITTING_Y,
   PAUSE_DURATION,
-  FRAME_COUNTS,
+  CAT_FRAME_COUNTS,
 } from './canvas.config';
 
 // Interface remains the same
@@ -61,7 +61,7 @@ export class CatBehaviorService {
             currentAnimationDef.frameDelay
           ) {
             mutableCat.currentFrame =
-              (currentCat.currentFrame + 1) % FRAME_COUNTS['walk-left'];
+              (currentCat.currentFrame + 1) % CAT_FRAME_COUNTS['walk-left'];
             mutableCat.lastFrameTime = timestamp;
             catPropsChanged = true;
           }
@@ -111,7 +111,12 @@ export class CatBehaviorService {
         ) {
           const nextFrame = currentCat.currentFrame + 1;
 
-          if (nextFrame >= FRAME_COUNTS[currentCat.currentAnimation]) {
+          if (
+            nextFrame >=
+            CAT_FRAME_COUNTS[
+              currentCat.currentAnimation as keyof typeof CAT_FRAME_COUNTS
+            ]
+          ) {
             // Animation finished
             // console.log(
             //   `Animation ${currentCat.currentAnimation} finished, returning to SITTING_AT_SPOT`,

@@ -1,24 +1,44 @@
 import { Injectable } from '@angular/core';
+// Types
 import {
   Animation,
   AnimationName,
   AnimatedSprite,
   GameSprite,
   LoadedAssets,
+  CatAnimationName,
+  TubAnimationName,
+  StaticSpriteConfig,
 } from './canvas.types';
+
+// Cat configurations
 import {
-  ANIMATION_ROWS,
-  FRAME_COUNTS,
-  FRAME_SIZE,
-  DEFAULT_FRAME_DELAY,
+  CAT_ANIMATION_ROWS,
+  CAT_FRAME_COUNTS,
   CAT_SITTING_Y,
   CAT_SPRITE_SHEET_PATH,
+} from './canvas.config';
+
+// Tub configurations
+import {
+  TUB_ANIMATION_ROWS,
+  TUB_FRAME_COUNTS,
+  TUB_FRAME_SIZE,
+  TUB_DEFAULT_X,
+  TUB_DEFAULT_Y,
+  TUB_SPRITE_SHEET_PATH,
+} from './canvas.config';
+
+// General configurations
+import {
+  FRAME_SIZE,
+  DEFAULT_FRAME_DELAY,
   STATIC_SPRITE_CONFIGS,
-  CANVAS_WIDTH, // Import CANVAS_WIDTH if needed for initial positioning
+  CANVAS_WIDTH,
 } from './canvas.config';
 
 @Injectable({
-  providedIn: 'root', // Provide globally or limit to the component if preferred
+  providedIn: 'root',
 })
 export class AssetLoaderService {
   async loadGameAssets(): Promise<LoadedAssets> {
@@ -42,16 +62,31 @@ export class AssetLoaderService {
         animations,
       };
 
+      // Load Tub Sprite Sheet
+      const tubImage = await this.loadImage(TUB_SPRITE_SHEET_PATH);
+      const tubAnimations = this.createTubAnimations();
+      const initialTub: AnimatedSprite = {
+        image: tubImage,
+        x: TUB_DEFAULT_X,
+        y: TUB_DEFAULT_Y,
+        width: TUB_FRAME_SIZE,
+        height: TUB_FRAME_SIZE,
+        currentAnimation: 'tub-empty', // Default to empty state
+        currentFrame: 0,
+        lastFrameTime: 0, // Not critical for single-frame states
+        animations: tubAnimations,
+      };
+
       // Load Static Sprites
       const loadedStaticSprites = await this.loadStaticSprites();
 
       return {
         staticSprites: loadedStaticSprites,
         cat: initialCat,
+        tub: initialTub,
       };
     } catch (error) {
       console.error('Failed to load game assets:', error);
-      // Re-throw or return a specific error state if needed
       throw error;
     }
   }
@@ -67,37 +102,76 @@ export class AssetLoaderService {
 
   private createCatAnimations(): Map<AnimationName, Animation> {
     const animations = new Map<AnimationName, Animation>();
-    const createAnimation = (name: AnimationName): Animation => ({
+    const createAnimation = (name: CatAnimationName): Animation => ({
       name,
-      frames: Array.from({ length: FRAME_COUNTS[name] }, (_, i) => ({
+      frames: Array.from({ length: CAT_FRAME_COUNTS[name] }, (_, i) => ({
         x: i * FRAME_SIZE,
-        y: ANIMATION_ROWS[name] * FRAME_SIZE,
+        y: CAT_ANIMATION_ROWS[name] * FRAME_SIZE,
         width: FRAME_SIZE,
         height: FRAME_SIZE,
       })),
       frameDelay: DEFAULT_FRAME_DELAY, // Use default, can be customized per animation later
     });
 
-    (Object.keys(ANIMATION_ROWS) as AnimationName[]).forEach((animName) => {
-      animations.set(animName, createAnimation(animName));
+    (Object.keys(CAT_ANIMATION_ROWS) as CatAnimationName[]).forEach(
+      (animName) => {
+        animations.set(animName, createAnimation(animName));
+      },
+    );
+    return animations;
+  }
+
+  private createTubAnimations(): Map<AnimationName, Animation> {
+    const animations = new Map<AnimationName, Animation>();
+    const createAnimation = (name: TubAnimationName): Animation => ({
+      name,
+      frames: Array.from({ length: TUB_FRAME_COUNTS[name] }, (_, i) => ({
+        // For single frame animations, 'i' will always be 0.
+        // Frame x position on the sheet.
+        x: i * TUB_FRAME_SIZE,
+        // Frame y position on the sheet based on animation row.
+        y: TUB_ANIMATION_ROWS[name] * TUB_FRAME_SIZE,
+        width: TUB_FRAME_SIZE,
+        height: TUB_FRAME_SIZE,
+      })),
+      // frameDelay is less relevant for single-frame states but required by the type.
+      frameDelay: DEFAULT_FRAME_DELAY,
     });
+
+    (Object.keys(TUB_ANIMATION_ROWS) as TubAnimationName[]).forEach(
+      (animName) => {
+        animations.set(animName, createAnimation(animName));
+      },
+    );
     return animations;
   }
 
   private async loadStaticSprites(): Promise<Map<string, GameSprite>> {
     const loadedSprites = new Map<string, GameSprite>();
+
+    // Early return if no static sprites configured
+    if (STATIC_SPRITE_CONFIGS.length === 0) {
+      return loadedSprites;
+    }
+
     await Promise.all(
-      STATIC_SPRITE_CONFIGS.map(async (config) => {
-        const image = await this.loadImage(config.src);
-        loadedSprites.set(config.id, {
-          image,
-          x: config.x,
-          y: config.y,
-          width: config.width,
-          height: config.height,
-        });
+      STATIC_SPRITE_CONFIGS.map(async (config: StaticSpriteConfig) => {
+        try {
+          const image = await this.loadImage(config.src);
+          loadedSprites.set(config.id, {
+            image,
+            x: config.x,
+            y: config.y,
+            width: config.width,
+            height: config.height,
+          });
+        } catch (error) {
+          console.error(`Failed to load static sprite ${config.id}:`, error);
+          // Continue loading other sprites even if one fails
+        }
       }),
     );
+
     return loadedSprites;
   }
 }
