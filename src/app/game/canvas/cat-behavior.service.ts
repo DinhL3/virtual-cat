@@ -3,7 +3,7 @@ import {
   AnimatedSprite,
   CatState,
   CatSitAnimation,
-  AnimationName, // Ensure AnimationName is imported if needed, though not directly used in logic here
+  AnimationName,
 } from './canvas.types';
 import {
   WALK_SPEED,
@@ -13,7 +13,6 @@ import {
   CAT_FRAME_COUNTS,
 } from './canvas.config';
 
-// Interface remains the same
 export interface CatUpdateResult {
   nextState?: CatState;
   updatedCat?: Partial<AnimatedSprite>;
@@ -21,7 +20,7 @@ export interface CatUpdateResult {
 }
 
 @Injectable({
-  providedIn: 'root', // Provide globally or limit if preferred
+  providedIn: 'root',
 })
 export class CatBehaviorService {
   updateCat(
@@ -31,7 +30,7 @@ export class CatBehaviorService {
     timestamp: number,
   ): CatUpdateResult {
     const result: CatUpdateResult = {};
-    const mutableCat: Partial<AnimatedSprite> = {}; // Track changes
+    const mutableCat: Partial<AnimatedSprite> = {};
     let stateChanged = false;
     let catPropsChanged = false;
 
@@ -39,15 +38,18 @@ export class CatBehaviorService {
       currentCat.currentAnimation,
     );
 
-    // Add a check for DRAGGED state early, as it bypasses normal animation logic
-    // Also check if currentAnimationDef exists to prevent errors
-    if (!currentAnimationDef || currentState === CatState.DRAGGED) {
-      // If dragged, the component handles position and state transitions.
-      // No state transitions or property updates initiated from this service while DRAGGED.
-      return {}; // Return empty result
+    // Skip animation logic for DRAGGED and IN_TUB states
+    if (
+      !currentAnimationDef ||
+      currentState === CatState.DRAGGED ||
+      currentState === CatState.IN_TUB
+    ) {
+      // For IN_TUB state, the cat should stay in the 'in-tub' animation
+      // No state transitions or updates needed while in tub
+      return {};
     }
 
-    // Proceed with normal state logic only if not DRAGGED
+    // Proceed with normal state logic for other states
     switch (currentState) {
       case CatState.WALKING_TO_SPOT:
         if (currentCat.x > CAT_TARGET_X) {
@@ -67,15 +69,14 @@ export class CatBehaviorService {
           }
         } else {
           // Reached destination
-          //   console.log('Cat reached target spot, switching to SITTING_AT_SPOT');
-          mutableCat.x = CAT_TARGET_X; // Snap to exact target X
-          mutableCat.y = CAT_SITTING_Y; // Ensure Y is correct target Y
+          mutableCat.x = CAT_TARGET_X;
+          mutableCat.y = CAT_SITTING_Y;
           mutableCat.currentAnimation = 'sit-blink';
           mutableCat.currentFrame = 0;
           mutableCat.lastFrameTime = timestamp;
           catPropsChanged = true;
 
-          result.nextSitStartTime = timestamp; // Start the pause timer
+          result.nextSitStartTime = timestamp;
           result.nextState = CatState.SITTING_AT_SPOT;
           stateChanged = true;
         }
@@ -84,7 +85,6 @@ export class CatBehaviorService {
       case CatState.SITTING_AT_SPOT:
         if (timestamp - lastSitStartTime >= PAUSE_DURATION) {
           // Pause is over
-          //   console.log('Pause finished, starting random animation at spot');
           const sitAnimations: CatSitAnimation[] = [
             CatSitAnimation.BLINK,
             CatSitAnimation.TAIL_WHIP,
@@ -101,7 +101,6 @@ export class CatBehaviorService {
           result.nextState = CatState.ANIMATING_AT_SPOT;
           stateChanged = true;
         }
-        // No visual updates during pause itself
         break;
 
       case CatState.ANIMATING_AT_SPOT:
@@ -118,15 +117,12 @@ export class CatBehaviorService {
             ]
           ) {
             // Animation finished
-            // console.log(
-            //   `Animation ${currentCat.currentAnimation} finished, returning to SITTING_AT_SPOT`,
-            // );
-            mutableCat.currentAnimation = 'sit-blink'; // Back to base sit pose
+            mutableCat.currentAnimation = 'sit-blink';
             mutableCat.currentFrame = 0;
             mutableCat.lastFrameTime = timestamp;
             catPropsChanged = true;
 
-            result.nextSitStartTime = timestamp; // Start the pause timer *now*
+            result.nextSitStartTime = timestamp;
             result.nextState = CatState.SITTING_AT_SPOT;
             stateChanged = true;
           } else {
@@ -137,15 +133,12 @@ export class CatBehaviorService {
           }
         }
         break;
-
-      // NOTE: No DRAGGED case needed here as it's handled by the early return check
     }
 
     if (catPropsChanged) {
       result.updatedCat = mutableCat;
     }
 
-    // Only return state if it actually changed
     if (!stateChanged) {
       delete result.nextState;
     }

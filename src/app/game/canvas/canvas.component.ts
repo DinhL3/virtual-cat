@@ -1,4 +1,3 @@
-// canvas.component.ts
 import {
   AfterViewInit,
   Component,
@@ -10,7 +9,6 @@ import {
   inject,
   ChangeDetectionStrategy,
   HostListener,
-  // effect, // Not used in this snippet, remove if not needed elsewhere
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -20,7 +18,7 @@ import {
   CatState,
   GameSprite,
   AnimationName,
-} from './canvas.types'; // Added AnimationName
+} from './canvas.types';
 import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
@@ -83,11 +81,12 @@ export class CanvasComponent implements AfterViewInit {
   protected readonly canvasHeight = CANVAS_HEIGHT;
 
   private isLoading = signal(true);
-  private sprites = signal<Map<string, GameSprite>>(new Map()); // For other static sprites
+  private sprites = signal<Map<string, GameSprite>>(new Map());
   private cat = signal<AnimatedSprite | null>(null);
-  private tub = signal<AnimatedSprite | null>(null); // Signal for the tub
+  private tub = signal<AnimatedSprite | null>(null);
   private catState = signal<CatState>(CatState.WALKING_TO_SPOT);
   private lastSitStartTime = signal<number>(0);
+  private isCatInTub = signal(false); // New signal to track if cat is in tub
 
   protected canvasClass = computed(() => ({
     'cursor-wait': this.isLoading(),
@@ -106,7 +105,7 @@ export class CanvasComponent implements AfterViewInit {
           cat
             ? {
                 ...cat,
-                currentAnimation: 'carried' as AnimationName, // Ensure type compatibility
+                currentAnimation: 'carried' as AnimationName,
                 currentFrame: 0,
               }
             : null,
@@ -124,7 +123,7 @@ export class CanvasComponent implements AfterViewInit {
     this.inputService.dragEnd
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        this.resetCatAfterDrag();
+        this.handleDragEnd();
       });
   }
 
@@ -148,7 +147,7 @@ export class CanvasComponent implements AfterViewInit {
       const assets = await this.assetLoader.loadGameAssets();
       this.sprites.set(assets.staticSprites);
       this.cat.set(assets.cat);
-      this.tub.set(assets.tub); // Set the tub signal
+      this.tub.set(assets.tub);
       this.catState.set(CatState.WALKING_TO_SPOT);
       this.isLoading.set(false);
       this.startGameLoop();
@@ -202,9 +201,6 @@ export class CanvasComponent implements AfterViewInit {
     if (updateResult.nextSitStartTime !== undefined) {
       this.lastSitStartTime.set(updateResult.nextSitStartTime);
     }
-    // Note: Tub animation/state is not updated here yet.
-    // To change tub state, you would do:
-    // this.tub.update(t => t ? {...t, currentAnimation: 'tub-filled'} : null);
   }
 
   private draw(): void {
@@ -222,7 +218,19 @@ export class CanvasComponent implements AfterViewInit {
       );
     }
 
-    // Draw Tub
+    // Draw sprites in correct order based on whether cat is in tub
+    if (this.isCatInTub()) {
+      // Cat is in tub: draw cat first (behind), then tub (in front)
+      this.drawCat();
+      this.drawTub();
+    } else {
+      // Normal order: tub first, then cat
+      this.drawTub();
+      this.drawCat();
+    }
+  }
+
+  private drawTub(): void {
     const tubSprite = this.tub();
     if (tubSprite) {
       const animation = tubSprite.animations.get(tubSprite.currentAnimation);
@@ -241,12 +249,12 @@ export class CanvasComponent implements AfterViewInit {
         );
       }
     }
+  }
 
-    // Draw Cat
+  private drawCat(): void {
     const catSprite = this.cat();
     if (catSprite) {
       const animation = catSprite.animations.get(catSprite.currentAnimation);
-      // Check if animation and frame are valid to prevent errors during state transitions
       if (animation && catSprite.currentFrame < animation.frames.length) {
         const frame = animation.frames[catSprite.currentFrame];
         this.ctx.drawImage(
@@ -271,24 +279,116 @@ export class CanvasComponent implements AfterViewInit {
       return (
         !this.isLoading() &&
         (currentState === CatState.SITTING_AT_SPOT ||
-          currentState === CatState.ANIMATING_AT_SPOT)
+          currentState === CatState.ANIMATING_AT_SPOT ||
+          currentState === CatState.IN_TUB) // Allow dragging from IN_TUB state
       );
     });
   }
 
+  private handleDragEnd(): void {
+    const currentCat = this.cat();
+    const currentTub = this.tub();
+
+    if (!currentCat || !currentTub) return;
+
+    // Check if cat was dropped in the tub
+    if (this.isCatInTubCollision(currentCat, currentTub)) {
+      this.putCatInTub();
+    } else {
+      this.resetCatAfterDrag();
+    }
+  }
+
+  private isCatInTubCollision(
+    cat: AnimatedSprite,
+    tub: AnimatedSprite,
+  ): boolean {
+    // Simple bounding box collision detection
+    const catCenterX = cat.x + cat.width / 2;
+    const catCenterY = cat.y + cat.height / 2;
+
+    // Check if cat's center is within tub bounds
+    return (
+      catCenterX >= tub.x &&
+      catCenterX <= tub.x + tub.width &&
+      catCenterY >= tub.y &&
+      catCenterY <= tub.y + tub.height
+    );
+  }
+
+  private putCatInTub(): void {
+    const currentTimestamp = performance.now();
+    const currentTub = this.tub();
+
+    if (!currentTub) return;
+
+    // Position cat in the center of the tub
+    const tubCenterX =
+      currentTub.x + (currentTub.width - this.cat()!.width) / 2;
+    const tubCenterY =
+      currentTub.y + (currentTub.height - this.cat()!.height) / 2;
+
+    // Update cat position and animation to in-tub state
+    this.cat.update((cat) => {
+      if (!cat) return null;
+      return {
+        ...cat,
+        x: tubCenterX,
+        y: tubCenterY,
+        currentAnimation: 'in-tub' as AnimationName, // Use the new in-tub animation
+        currentFrame: 0,
+        lastFrameTime: currentTimestamp,
+      };
+    });
+
+    // Update tub to filled state
+    this.tub.update((tub) => {
+      if (!tub) return null;
+      return {
+        ...tub,
+        currentAnimation: 'tub-filled' as AnimationName,
+        currentFrame: 0,
+      };
+    });
+
+    // Update states
+    this.isCatInTub.set(true);
+    this.catState.set(CatState.IN_TUB); // Use IN_TUB state instead of SITTING_AT_SPOT
+    this.lastSitStartTime.set(currentTimestamp);
+
+    console.log('Cat is now in the tub!');
+  }
+
   private resetCatAfterDrag(): void {
     const currentTimestamp = performance.now();
+
+    // If cat was in tub and dragged out, reset tub to empty
+    if (this.isCatInTub()) {
+      this.tub.update((tub) => {
+        if (!tub) return null;
+        return {
+          ...tub,
+          currentAnimation: 'tub-empty' as AnimationName,
+          currentFrame: 0,
+        };
+      });
+      this.isCatInTub.set(false);
+      console.log('Cat removed from tub');
+    }
+
+    // Reset cat to original position
     this.cat.update((cat) => {
       if (!cat) return null;
       return {
         ...cat,
         x: CAT_TARGET_X,
         y: CAT_SITTING_Y,
-        currentAnimation: 'sit-blink' as AnimationName, // Ensure type compatibility
+        currentAnimation: 'sit-blink' as AnimationName,
         currentFrame: 0,
         lastFrameTime: currentTimestamp,
       };
     });
+
     this.catState.set(CatState.SITTING_AT_SPOT);
     this.lastSitStartTime.set(currentTimestamp);
   }

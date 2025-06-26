@@ -21,6 +21,7 @@ export const CAT_ANIMATION_ROWS: Readonly<Record<CatAnimationName, number>> = {
   'walk-left': 3,
   'walk-right': 4,
   carried: 5,
+  'in-tub': 6, // New row for in-tub animation
 };
 
 export const CAT_FRAME_COUNTS: Readonly<Record<CatAnimationName, number>> = {
@@ -30,6 +31,7 @@ export const CAT_FRAME_COUNTS: Readonly<Record<CatAnimationName, number>> = {
   'sit-groom-paw': 15,
   'walk-right': 9,
   carried: 1,
+  'in-tub': 1, // Single frame for in-tub state
 };
 
 // --- Cat Behavior Constants ---

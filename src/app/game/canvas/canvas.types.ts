@@ -4,7 +4,8 @@ export type CatAnimationName =
   | 'sit-tail-whip'
   | 'sit-groom-paw'
   | 'walk-right'
-  | 'carried';
+  | 'carried'
+  | 'in-tub';
 
 export type TubAnimationName = 'tub-empty' | 'tub-filled';
 
@@ -40,6 +41,12 @@ export enum CatState {
   SITTING_AT_SPOT,
   ANIMATING_AT_SPOT,
   DRAGGED,
+  IN_TUB, // New state for when cat is in the tub
+}
+
+export enum TubState {
+  EMPTY,
+  FILLED,
 }
 
 export enum CatSitAnimation {
@@ -71,4 +78,18 @@ export interface LoadedAssets {
   staticSprites: Map<string, GameSprite>;
   cat: AnimatedSprite;
   tub: AnimatedSprite;
+}
+
+// Collision detection utility interface
+export interface CollisionBounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+// Tub interaction result interface
+export interface TubInteractionResult {
+  catInTub: boolean;
+  tubState: TubState;
 }
