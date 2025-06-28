@@ -11,9 +11,9 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { GameService } from '../services/game.service';
-import { AuthService } from '../services/auth.service'; // Import AuthService
+import { AuthService } from '../services/auth.service';
 import { CanvasComponent } from './canvas/canvas.component';
-import { firstValueFrom } from 'rxjs'; // Import if using RxJS >= 7 for async conversion
+import { firstValueFrom } from 'rxjs';
 
 interface GameState {
   currentDay: number;
@@ -30,28 +30,23 @@ interface GameSave {
   imports: [CommonModule, CanvasComponent],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
-  // changeDetection: ChangeDetectionStrategy.OnPush, // Optional strategy
 })
 export class GameComponent {
-  // --- Injected Services ---
   private router = inject(Router);
   private gameService = inject(GameService);
-  private auth = inject(AuthService); // Inject AuthService
+  private auth = inject(AuthService);
   private elementRef = inject(ElementRef);
 
-  // --- State Signals ---
   protected isLoading = signal(true);
   protected errorMessage = signal<string | null>(null);
   protected gameSave = signal<GameSave | null>(null);
   protected isMenuOpen = signal(false);
 
-  // --- Template References ---
   @ViewChild('burgerButton', { static: false })
   burgerButtonRef?: ElementRef<HTMLButtonElement>;
   @ViewChild('burgerMenu', { static: false })
   burgerMenuRef?: ElementRef<HTMLDivElement>;
 
-  // --- Computed Values ---
   protected showGame = computed(
     () => !this.isLoading() && !this.errorMessage() && this.gameSave(),
   );
@@ -60,7 +55,6 @@ export class GameComponent {
     this.loadGameSave();
   }
 
-  // --- Menu Logic ---
   toggleMenu(): void {
     this.isMenuOpen.update((open) => !open);
   }
@@ -71,16 +65,15 @@ export class GameComponent {
 
   async returnToMainMenu(): Promise<void> {
     this.closeMenu();
-    await this.router.navigate(['/main-menu']); // Navigate to main menu
+    await this.router.navigate(['/main-menu']);
   }
 
   async logout(): Promise<void> {
     this.closeMenu();
-    this.auth.logout(); // Call AuthService logout
-    await this.router.navigate(['/welcome']); // Navigate to welcome screen
+    this.auth.logout();
+    await this.router.navigate(['/welcome']);
   }
 
-  // --- Host Listener for Outside Clicks ---
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if (!this.isMenuOpen()) {
@@ -100,12 +93,10 @@ export class GameComponent {
     }
   }
 
-  // --- Data Loading ---
   private async loadGameSave(): Promise<void> {
     this.isLoading.set(true);
     this.errorMessage.set(null);
     try {
-      // Assuming gameService.loadGame() returns an Observable
       const response = await firstValueFrom(this.gameService.loadGame());
 
       if (response && response.gameSave) {

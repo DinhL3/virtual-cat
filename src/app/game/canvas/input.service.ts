@@ -21,24 +21,18 @@ export interface Position {
 }
 
 @Injectable({
-  providedIn: 'root', // Or provide only where needed
+  providedIn: 'root',
 })
 export class InputService {
   private destroyRef = inject(DestroyRef);
-  private canvasEl!: HTMLCanvasElement; // Will be set during initialization
-  private document = document; // Inject or use global document
+  private canvasEl!: HTMLCanvasElement;
+  private document = document;
 
-  // --- Signals for external consumption ---
-  // Readonly signal indicating drag state
   private readonly _isDragging = signal(false);
   readonly isDragging = this._isDragging.asReadonly();
 
-  // --- Subjects for event emission ---
-  // Emits offset when drag starts
   readonly dragStart = new Subject<DragEvent>();
-  // Emits new position during drag
   readonly dragMove = new Subject<Position>();
-  // Emits when drag ends
   readonly dragEnd = new Subject<void>();
 
   private mouseMoveSubscription: Subscription | null = null;
@@ -46,13 +40,10 @@ export class InputService {
 
   initialize(canvasElement: HTMLCanvasElement): void {
     if (!canvasElement) {
-      console.error(
-        'InputService: Canvas element not provided for initialization.',
-      );
+      console.error('InputService: Canvas element not provided for initialization.');
       return;
     }
     this.canvasEl = canvasElement;
-    console.log('InputService initialized.');
   }
 
   // Called by the component on mousedown
