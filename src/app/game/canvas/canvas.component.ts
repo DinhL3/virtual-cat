@@ -1,3 +1,4 @@
+// canvas.component.ts
 import {
   AfterViewInit,
   Component,
@@ -35,13 +36,25 @@ import { InputService, Position } from './input.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <canvas
-      #gameCanvas
-      [attr.width]="canvasWidth"
-      [attr.height]="canvasHeight"
-      [class]="canvasClass()"
-      style="touch-action: none;"
-    ></canvas>
+    <div class="game-container">
+      <canvas
+        #gameCanvas
+        [attr.width]="canvasWidth"
+        [attr.height]="canvasHeight"
+        [class]="canvasClass()"
+        style="touch-action: none;"
+      ></canvas>
+
+      @if (isCatInTub()) {
+        <button
+          class="button outlined primary wash-button"
+          (click)="onWashButtonClick()"
+          type="button"
+        >
+          Wash
+        </button>
+      }
+    </div>
   `,
   styles: [
     `
@@ -50,6 +63,12 @@ import { InputService, Position } from './input.service';
         width: ${CANVAS_WIDTH}px;
         height: ${CANVAS_HEIGHT}px;
         margin: auto;
+      }
+      .game-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
       canvas {
         display: block;
@@ -63,6 +82,15 @@ import { InputService, Position } from './input.service';
       }
       .cursor-grabbing {
         cursor: grabbing;
+      }
+      .wash-button {
+        position: absolute;
+        top: ${(CANVAS_HEIGHT - 96) / 2 +
+        96 +
+        10}px; /* Tub bottom + small gap */
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
       }
     `,
   ],
@@ -86,7 +114,7 @@ export class CanvasComponent implements AfterViewInit {
   private tub = signal<AnimatedSprite | null>(null);
   private catState = signal<CatState>(CatState.WALKING_TO_SPOT);
   private lastSitStartTime = signal<number>(0);
-  private isCatInTub = signal(false); // New signal to track if cat is in tub
+  protected isCatInTub = signal(false); // New signal to track if cat is in tub
 
   protected canvasClass = computed(() => ({
     'cursor-wait': this.isLoading(),
@@ -355,8 +383,6 @@ export class CanvasComponent implements AfterViewInit {
     this.isCatInTub.set(true);
     this.catState.set(CatState.IN_TUB); // Use IN_TUB state instead of SITTING_AT_SPOT
     this.lastSitStartTime.set(currentTimestamp);
-
-    console.log('Cat is now in the tub!');
   }
 
   private resetCatAfterDrag(): void {
@@ -373,7 +399,6 @@ export class CanvasComponent implements AfterViewInit {
         };
       });
       this.isCatInTub.set(false);
-      console.log('Cat removed from tub');
     }
 
     // Reset cat to original position
@@ -391,5 +416,11 @@ export class CanvasComponent implements AfterViewInit {
 
     this.catState.set(CatState.SITTING_AT_SPOT);
     this.lastSitStartTime.set(currentTimestamp);
+  }
+
+  onWashButtonClick(): void {
+    console.log('Wash button clicked! Starting bath mini-game...');
+    // TODO: Implement bath mini-game logic here
+    // For now, just log that the button was clicked
   }
 }
