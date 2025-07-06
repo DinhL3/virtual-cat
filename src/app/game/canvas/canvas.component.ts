@@ -30,11 +30,12 @@ import {
 import { AssetLoaderService } from './asset-loader.service';
 import { CatBehaviorService } from './cat-behavior.service';
 import { InputService, Position } from './input.service';
+import { WashMinigameComponent } from '../mini-games/wash/wash-minigame.component';
 
 @Component({
   selector: 'app-canvas',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, WashMinigameComponent],
   template: `
     <div class="game-container">
       <canvas
@@ -53,6 +54,13 @@ import { InputService, Position } from './input.service';
         >
           Wash
         </button>
+      }
+
+      @if (isWashGameActive()) {
+        <app-wash-minigame
+          (gameComplete)="onWashGameComplete()"
+          (gameClosed)="onWashGameClosed()"
+        />
       }
     </div>
   `,
@@ -114,7 +122,8 @@ export class CanvasComponent implements AfterViewInit {
   private tub = signal<AnimatedSprite | null>(null);
   private catState = signal<CatState>(CatState.WALKING_TO_SPOT);
   private lastSitStartTime = signal<number>(0);
-  protected isCatInTub = signal(false); // New signal to track if cat is in tub
+  protected isCatInTub = signal(false);
+  protected isWashGameActive = signal(false);
 
   protected canvasClass = computed(() => ({
     'cursor-wait': this.isLoading(),
@@ -419,8 +428,17 @@ export class CanvasComponent implements AfterViewInit {
   }
 
   onWashButtonClick(): void {
-    console.log('Wash button clicked! Starting bath mini-game...');
-    // TODO: Implement bath mini-game logic here
-    // For now, just log that the button was clicked
+    this.isWashGameActive.set(true);
+  }
+
+  onWashGameComplete(): void {
+    console.log('Wash game completed!');
+    this.isWashGameActive.set(false);
+    // TODO: Update cat to clean state
+  }
+
+  onWashGameClosed(): void {
+    console.log('Wash game closed');
+    this.isWashGameActive.set(false);
   }
 }
