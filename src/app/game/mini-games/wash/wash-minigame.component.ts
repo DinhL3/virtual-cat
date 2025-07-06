@@ -15,25 +15,24 @@ export type WashBodyPart = 'head' | 'torso' | 'front-leg' | 'back-leg' | 'tail';
   imports: [CommonModule],
   template: `
     <div class="wash-overlay">
-      <div class="wash-container">
+      <div class="wash-container bg-light-yellow">
         <div class="wash-header">
-          <h3>Cat Washing Time!</h3>
+          <h5 class="text-primary">Cat Washing Time!</h5>
           <button class="close-button" (click)="onClose()" type="button">
             ✕
           </button>
         </div>
 
         <div class="wash-content">
-          <div class="instruction">
+          <div class="instruction text-secondary">
             Wash the <strong>{{ currentBodyPart() }}</strong>
           </div>
 
-          <!-- Mini-game canvas will go here -->
           <div class="game-area">
             <p>Mini-game area - Canvas will be here</p>
           </div>
 
-          <div class="progress">Progress: {{ progress() }}%</div>
+          <div class="progress text-tertiary">Progress: {{ progress() }}%</div>
         </div>
       </div>
     </div>
@@ -54,12 +53,8 @@ export type WashBodyPart = 'head' | 'torso' | 'front-leg' | 'back-leg' | 'tail';
       }
 
       .wash-container {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        max-width: 500px;
-        width: 90%;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        padding: 16px;
       }
 
       .wash-header {
@@ -67,17 +62,11 @@ export type WashBodyPart = 'head' | 'torso' | 'front-leg' | 'back-leg' | 'tail';
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
-        border-bottom: 2px solid #f0f0f0;
-        padding-bottom: 10px;
-      }
-
-      .wash-header h3 {
-        margin: 0;
-        color: #333;
+        // border-bottom: 1px solid #fed9b7;
       }
 
       .close-button {
-        background: #ff6b6b;
+        background: #00afb9;
         color: white;
         border: none;
         border-radius: 50%;
@@ -91,14 +80,13 @@ export type WashBodyPart = 'head' | 'torso' | 'front-leg' | 'back-leg' | 'tail';
       }
 
       .close-button:hover {
-        background: #ff5252;
+        background: #0081a7;
       }
 
       .instruction {
         text-align: center;
-        font-size: 18px;
-        margin-bottom: 20px;
-        color: #555;
+        font-size: 16px;
+        margin-bottom: 16px;
       }
 
       .game-area {
@@ -117,7 +105,6 @@ export type WashBodyPart = 'head' | 'torso' | 'front-leg' | 'back-leg' | 'tail';
       .progress {
         text-align: center;
         font-weight: bold;
-        color: #007bff;
       }
     `,
   ],
