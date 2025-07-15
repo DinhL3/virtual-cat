@@ -4,10 +4,22 @@ import {
   Output,
   signal,
   ChangeDetectionStrategy,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  inject,
+  DestroyRef,
+  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-export type WashBodyPart = 'head' | 'torso' | 'front-leg' | 'back-leg' | 'tail';
+import { WashService } from './wash.service';
+import { WashBodyPart, WashGameState, MouseScrubData } from './wash.types';
+import {
+  WASH_SPRITE_SIZE,
+  WASH_CAT_SPRITE_PATH,
+  BODY_PART_SEQUENCE,
+  CELL_SIZE,
+} from './wash.config';
 
 @Component({
   selector: 'app-wash-minigame',
@@ -15,24 +27,34 @@ export type WashBodyPart = 'head' | 'torso' | 'front-leg' | 'back-leg' | 'tail';
   imports: [CommonModule],
   template: `
     <div class="wash-overlay">
-      <div class="wash-container bg-light-yellow">
+      <div class="wash-container">
         <div class="wash-header">
-          <h5 class="text-primary">Cat Washing Time!</h5>
+          <h3>Cat Washing Time!</h3>
           <button class="close-button" (click)="onClose()" type="button">
             ✕
           </button>
         </div>
 
         <div class="wash-content">
-          <div class="instruction text-secondary">
+          <div class="instruction">
             Wash the <strong>{{ currentBodyPart() }}</strong>
           </div>
 
+          <!-- Mini-game canvas will go here -->
           <div class="game-area">
-            <p>Mini-game area - Canvas will be here</p>
+            <canvas
+              #washCanvas
+              [width]="canvasSize"
+              [height]="canvasSize"
+              (mousedown)="onMouseDown($event)"
+              (mousemove)="onMouseMove($event)"
+              (mouseup)="onMouseUp()"
+              (mouseleave)="onMouseUp()"
+              style="touch-action: none; border-radius: 6px; background: #e9ecef;"
+            ></canvas>
           </div>
 
-          <div class="progress text-tertiary">Progress: {{ progress() }}%</div>
+          <div class="progress">Progress: {{ progress() }}%</div>
         </div>
       </div>
     </div>
@@ -53,8 +75,12 @@ export type WashBodyPart = 'head' | 'torso' | 'front-leg' | 'back-leg' | 'tail';
       }
 
       .wash-container {
-        border-radius: 8px;
-        padding: 16px;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
 
       .wash-header {
@@ -62,11 +88,17 @@ export type WashBodyPart = 'head' | 'torso' | 'front-leg' | 'back-leg' | 'tail';
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
-        // border-bottom: 1px solid #fed9b7;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 10px;
+      }
+
+      .wash-header h3 {
+        margin: 0;
+        color: #333;
       }
 
       .close-button {
-        background: #00afb9;
+        background: #ff6b6b;
         color: white;
         border: none;
         border-radius: 50%;
@@ -80,13 +112,14 @@ export type WashBodyPart = 'head' | 'torso' | 'front-leg' | 'back-leg' | 'tail';
       }
 
       .close-button:hover {
-        background: #0081a7;
+        background: #ff5252;
       }
 
       .instruction {
         text-align: center;
-        font-size: 16px;
-        margin-bottom: 16px;
+        font-size: 18px;
+        margin-bottom: 20px;
+        color: #555;
       }
 
       .game-area {
@@ -105,22 +138,164 @@ export type WashBodyPart = 'head' | 'torso' | 'front-leg' | 'back-leg' | 'tail';
       .progress {
         text-align: center;
         font-weight: bold;
+        color: #007bff;
       }
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WashMinigameComponent {
+export class WashMinigameComponent implements AfterViewInit {
+  @ViewChild('washCanvas') private canvasRef!: ElementRef<HTMLCanvasElement>;
   @Output() gameComplete = new EventEmitter<void>();
   @Output() gameClosed = new EventEmitter<void>();
 
-  // Game state signals
-  protected currentBodyPart = signal<WashBodyPart>('head');
-  protected progress = signal(0);
+  private destroyRef = inject(DestroyRef);
+  private washService = inject(WashService);
+  private ctx!: CanvasRenderingContext2D;
+  private catImage: HTMLImageElement | null = null;
+
+  // Game state
+  protected gameState = signal<WashGameState>(
+    this.washService.createInitialGameState(),
+  );
+  protected readonly canvasSize = WASH_SPRITE_SIZE;
+
+  protected currentBodyPart = computed(() => this.gameState().currentPart);
+  protected progress = computed(() => {
+    const completedCount = this.gameState().completedParts.length;
+    const totalCount = BODY_PART_SEQUENCE.length;
+    if (totalCount === 0) {
+      return 100;
+    }
+    return Math.round((completedCount / totalCount) * 100);
+  });
+
+  // Mouse/scrub state
+  private scrubData: MouseScrubData = {
+    isDown: false,
+    lastPosition: null,
+    currentStreak: 0,
+    totalDistance: 0,
+  };
+
+  async ngAfterViewInit(): Promise<void> {
+    // Use setTimeout to ensure DOM is fully rendered when component is conditionally shown
+    setTimeout(async () => {
+      // Add safety check for ViewChild
+      if (!this.canvasRef?.nativeElement) {
+        console.error('Canvas element not found');
+        return;
+      }
+
+      const canvas = this.canvasRef.nativeElement;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Failed to get 2D rendering context for wash canvas');
+        return;
+      }
+
+      this.ctx = ctx;
+      this.ctx.imageSmoothingEnabled = false;
+
+      try {
+        // Load cat sprite
+        await this.loadCatSprite();
+        this.draw();
+      } catch (error) {
+        console.error('Failed to initialize wash mini-game:', error);
+      }
+    }, 0);
+  }
+
+  private async loadCatSprite(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => {
+        this.catImage = image;
+        resolve();
+      };
+      image.onerror = () => reject('Failed to load wash cat sprite');
+      image.src = WASH_CAT_SPRITE_PATH;
+    });
+  }
+
+  private draw(): void {
+    if (!this.ctx || !this.catImage) return;
+
+    // Clear canvas
+    this.ctx.clearRect(0, 0, this.canvasSize, this.canvasSize);
+
+    // Get current sprite row based on progress
+    const currentRow = this.washService.getCurrentSpriteRow(
+      this.gameState().completedParts,
+    );
+
+    // Draw cat sprite
+    this.ctx.drawImage(
+      this.catImage,
+      0, // source x
+      currentRow * WASH_SPRITE_SIZE, // source y (row)
+      WASH_SPRITE_SIZE, // source width
+      WASH_SPRITE_SIZE, // source height
+      0, // dest x
+      0, // dest y
+      this.canvasSize, // dest width
+      this.canvasSize, // dest height
+    );
+
+    // Draw grid overlay for debugging (optional)
+    // this.drawGrid();
+  }
+
+  // Mouse event handlers
+  onMouseDown(event: MouseEvent): void {
+    event.preventDefault(); // Prevent default drag behavior
+    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
+    const mousePos = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+
+    this.scrubData.isDown = true;
+    this.scrubData.lastPosition = mousePos;
+  }
+
+  onMouseMove(event: MouseEvent): void {
+    if (!this.scrubData.isDown) return;
+
+    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
+    const mousePos = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+
+    // Process interaction
+    const newGameState = this.washService.processInteraction(
+      this.gameState(),
+      this.scrubData,
+      mousePos,
+    );
+
+    // Update game state if changed
+    if (newGameState !== this.gameState()) {
+      this.gameState.set(newGameState);
+      this.draw();
+
+      // Check if game is complete
+      if (newGameState.isGameComplete) {
+        setTimeout(() => this.gameComplete.emit(), 500); // Small delay for effect
+      }
+    }
+
+    this.scrubData.lastPosition = mousePos;
+  }
+
+  onMouseUp(): void {
+    this.scrubData.isDown = false;
+    this.scrubData.lastPosition = null;
+  }
 
   onClose(): void {
     this.gameClosed.emit();
   }
-
-  // TODO: Add mini-game logic methods here
 }
