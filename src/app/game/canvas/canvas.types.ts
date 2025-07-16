@@ -42,6 +42,7 @@ export enum CatState {
   ANIMATING_AT_SPOT,
   DRAGGED,
   IN_TUB, // New state for when cat is in the tub
+  WALKING_AWAY,
 }
 
 export enum TubState {

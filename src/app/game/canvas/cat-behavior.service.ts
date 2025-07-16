@@ -133,6 +133,26 @@ export class CatBehaviorService {
           }
         }
         break;
+
+      case CatState.WALKING_AWAY:
+        // Always move left, no destination check
+        mutableCat.x = currentCat.x - WALK_SPEED;
+        catPropsChanged = true;
+
+        // Animate walk-left
+        if (
+          timestamp - currentCat.lastFrameTime >=
+          currentAnimationDef.frameDelay
+        ) {
+          mutableCat.currentFrame =
+            (currentCat.currentFrame + 1) % CAT_FRAME_COUNTS['walk-left'];
+          mutableCat.lastFrameTime = timestamp;
+          catPropsChanged = true;
+        }
+
+        // Note: No state transition - cat will keep walking until manually stopped
+        // or until the component detects it's off-screen
+        break;
     }
 
     if (catPropsChanged) {

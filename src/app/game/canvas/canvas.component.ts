@@ -46,7 +46,7 @@ import { WashMinigameComponent } from '../mini-games/wash/wash-minigame.componen
         style="touch-action: none;"
       ></canvas>
 
-      @if (isCatInTub()) {
+      @if (isCatInTub() && !isWashGameActive()) {
         <button
           class="button outlined primary wash-button"
           (click)="onWashButtonClick()"
@@ -124,12 +124,28 @@ export class CanvasComponent implements AfterViewInit {
   private lastSitStartTime = signal<number>(0);
   protected isCatInTub = signal(false);
   protected isWashGameActive = signal(false);
+  private isWashCompleted = signal(false);
 
   protected canvasClass = computed(() => ({
     'cursor-wait': this.isLoading(),
-    'cursor-default': !this.isLoading() && !this.inputService.isDragging(),
+    'cursor-default':
+      !this.isLoading() &&
+      !this.inputService.isDragging() &&
+      this.canInteractWithCat(),
     'cursor-grabbing': this.inputService.isDragging(),
   }));
+
+  // Helper to determine if we can interact with the cat
+  private canInteractWithCat = computed(() => {
+    const currentState = this.catState();
+    return (
+      !this.isLoading() &&
+      !this.isWashGameActive() &&
+      !this.isWashCompleted() &&
+      currentState !== CatState.WALKING_AWAY &&
+      currentState !== CatState.WALKING_TO_SPOT
+    );
+  });
 
   private animationFrameId?: number;
 
@@ -137,30 +153,39 @@ export class CanvasComponent implements AfterViewInit {
     this.inputService.dragStart
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((dragEvent) => {
-        this.catState.set(CatState.DRAGGED);
-        this.cat.update((cat) =>
-          cat
-            ? {
-                ...cat,
-                currentAnimation: 'carried' as AnimationName,
-                currentFrame: 0,
-              }
-            : null,
-        );
+        // Only start dragging if interactions are allowed
+        if (this.canInteractWithCat()) {
+          this.catState.set(CatState.DRAGGED);
+          this.cat.update((cat) =>
+            cat
+              ? {
+                  ...cat,
+                  currentAnimation: 'carried' as AnimationName,
+                  currentFrame: 0,
+                }
+              : null,
+          );
+        }
       });
 
     this.inputService.dragMove
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((position) => {
-        this.cat.update((c) =>
-          c ? { ...c, x: position.x, y: position.y } : null,
-        );
+        // Only update position if interactions are allowed
+        if (this.canInteractWithCat()) {
+          this.cat.update((c) =>
+            c ? { ...c, x: position.x, y: position.y } : null,
+          );
+        }
       });
 
     this.inputService.dragEnd
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        this.handleDragEnd();
+        // Only handle drag end if interactions are allowed
+        if (this.canInteractWithCat()) {
+          this.handleDragEnd();
+        }
       });
   }
 
@@ -214,8 +239,12 @@ export class CanvasComponent implements AfterViewInit {
 
   private update(deltaTime: number, timestamp: number): void {
     const currentCat = this.cat();
-    if (!currentCat || this.isLoading() || this.inputService.isDragging())
+    if (!currentCat || this.isLoading()) return;
+
+    // Don't update cat behavior if dragging and interactions are disabled
+    if (this.inputService.isDragging() && !this.canInteractWithCat()) {
       return;
+    }
 
     const currentState = this.catState();
     const currentSitStartTime = this.lastSitStartTime();
@@ -237,6 +266,16 @@ export class CanvasComponent implements AfterViewInit {
     }
     if (updateResult.nextSitStartTime !== undefined) {
       this.lastSitStartTime.set(updateResult.nextSitStartTime);
+    }
+
+    // Check if cat has walked completely off screen
+    if (
+      currentState === CatState.WALKING_AWAY &&
+      currentCat.x <= -currentCat.width
+    ) {
+      // Cat has left the screen, could reset game state here if needed
+      console.log('Cat has left the building!');
+      // Optional: Reset to initial state or trigger some other game event
     }
   }
 
@@ -312,13 +351,7 @@ export class CanvasComponent implements AfterViewInit {
   @HostListener('mousedown', ['$event'])
   onCanvasMouseDown(event: MouseEvent): void {
     this.inputService.handleMouseDown(event, this.cat(), () => {
-      const currentState = this.catState();
-      return (
-        !this.isLoading() &&
-        (currentState === CatState.SITTING_AT_SPOT ||
-          currentState === CatState.ANIMATING_AT_SPOT ||
-          currentState === CatState.IN_TUB) // Allow dragging from IN_TUB state
-      );
+      return this.canInteractWithCat();
     });
   }
 
@@ -372,7 +405,7 @@ export class CanvasComponent implements AfterViewInit {
         ...cat,
         x: tubCenterX,
         y: tubCenterY,
-        currentAnimation: 'in-tub' as AnimationName, // Use the new in-tub animation
+        currentAnimation: 'in-tub' as AnimationName,
         currentFrame: 0,
         lastFrameTime: currentTimestamp,
       };
@@ -390,7 +423,7 @@ export class CanvasComponent implements AfterViewInit {
 
     // Update states
     this.isCatInTub.set(true);
-    this.catState.set(CatState.IN_TUB); // Use IN_TUB state instead of SITTING_AT_SPOT
+    this.catState.set(CatState.IN_TUB);
     this.lastSitStartTime.set(currentTimestamp);
   }
 
@@ -434,11 +467,60 @@ export class CanvasComponent implements AfterViewInit {
   onWashGameComplete(): void {
     console.log('Wash game completed!');
     this.isWashGameActive.set(false);
-    // TODO: Update cat to clean state
+    this.isWashCompleted.set(true);
+
+    // Start the cat walking away sequence
+    this.startCatWalkingAway();
+  }
+
+  private startCatWalkingAway(): void {
+    const currentTimestamp = performance.now();
+    const currentTub = this.tub();
+
+    if (!currentTub) return;
+
+    // Position cat at the tub center (where it should be after washing)
+    const tubCenterX =
+      currentTub.x + (currentTub.width - this.cat()!.width) / 2;
+    const tubCenterY =
+      currentTub.y + (currentTub.height - this.cat()!.height) / 2;
+
+    // Update cat to start walking left animation
+    this.cat.update((cat) => {
+      if (!cat) return null;
+      return {
+        ...cat,
+        x: tubCenterX,
+        y: tubCenterY,
+        currentAnimation: 'walk-left' as AnimationName,
+        currentFrame: 0,
+        lastFrameTime: currentTimestamp,
+      };
+    });
+
+    // Reset tub to empty state
+    this.tub.update((tub) => {
+      if (!tub) return null;
+      return {
+        ...tub,
+        currentAnimation: 'tub-empty' as AnimationName,
+        currentFrame: 0,
+      };
+    });
+
+    // Update game state
+    this.isCatInTub.set(false);
+    this.catState.set(CatState.WALKING_AWAY);
+    this.lastSitStartTime.set(currentTimestamp);
   }
 
   onWashGameClosed(): void {
     console.log('Wash game closed');
     this.isWashGameActive.set(false);
+
+    // Only start walking away if the wash was completed
+    if (this.isWashCompleted()) {
+      this.startCatWalkingAway();
+    }
   }
 }
