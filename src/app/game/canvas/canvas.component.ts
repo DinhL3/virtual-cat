@@ -273,9 +273,8 @@ export class CanvasComponent implements AfterViewInit {
       currentState === CatState.WALKING_AWAY &&
       currentCat.x <= -currentCat.width
     ) {
-      // Cat has left the screen, could reset game state here if needed
-      console.log('Cat has left the building!');
-      // Optional: Reset to initial state or trigger some other game event
+      console.log('Cat has left the building! Starting new cat cycle...');
+      this.startNewCatCycle();
     }
   }
 
@@ -522,5 +521,43 @@ export class CanvasComponent implements AfterViewInit {
     if (this.isWashCompleted()) {
       this.startCatWalkingAway();
     }
+  }
+
+  private startNewCatCycle(): void {
+    console.log('Starting new cat cycle...');
+
+    // Reset all game state signals to initial values
+    this.isWashCompleted.set(false);
+    this.isCatInTub.set(false);
+    this.isWashGameActive.set(false);
+
+    // Reset cat to initial entering state
+    this.cat.update((cat) => {
+      if (!cat) return null;
+      return {
+        ...cat,
+        x: CANVAS_WIDTH, // Start off-screen right
+        y: CAT_SITTING_Y, // Start at the target Y level
+        currentAnimation: 'walk-left' as AnimationName, // Start walking left
+        currentFrame: 0,
+        lastFrameTime: performance.now(),
+      };
+    });
+
+    // Reset tub to empty state
+    this.tub.update((tub) => {
+      if (!tub) return null;
+      return {
+        ...tub,
+        currentAnimation: 'tub-empty' as AnimationName,
+        currentFrame: 0,
+      };
+    });
+
+    // Reset game state to walking to spot
+    this.catState.set(CatState.WALKING_TO_SPOT);
+    this.lastSitStartTime.set(0);
+
+    console.log('New cat is entering the scene!');
   }
 }
