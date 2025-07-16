@@ -55,6 +55,22 @@ export class GameComponent {
     this.loadGameSave();
   }
 
+  onWashCompleted(): void {
+    this.gameSave.update((currentSave) => {
+      if (!currentSave) {
+        return null;
+      }
+      const newMoney = currentSave.gameState.money + 10;
+      return {
+        ...currentSave,
+        gameState: {
+          ...currentSave.gameState,
+          money: newMoney,
+        },
+      };
+    });
+  }
+
   toggleMenu(): void {
     this.isMenuOpen.update((open) => !open);
   }

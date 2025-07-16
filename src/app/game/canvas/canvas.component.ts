@@ -10,6 +10,8 @@ import {
   inject,
   ChangeDetectionStrategy,
   HostListener,
+  Output,
+  EventEmitter,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -106,6 +108,7 @@ import { WashMinigameComponent } from '../mini-games/wash/wash-minigame.componen
 })
 export class CanvasComponent implements AfterViewInit {
   @ViewChild('gameCanvas') private canvasRef!: ElementRef<HTMLCanvasElement>;
+  @Output() washCompleted = new EventEmitter<void>();
   private ctx!: CanvasRenderingContext2D;
 
   private destroyRef = inject(DestroyRef);
@@ -467,6 +470,7 @@ export class CanvasComponent implements AfterViewInit {
     console.log('Wash game completed!');
     this.isWashGameActive.set(false);
     this.isWashCompleted.set(true);
+    this.washCompleted.emit();
 
     // Start the cat walking away sequence
     this.startCatWalkingAway();
