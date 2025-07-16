@@ -3,9 +3,7 @@ import {
   BODY_PART_HITBOXES,
   BODY_PART_SEQUENCE,
   CELL_SIZE,
-  MIN_SCRUB_DISTANCE,
-  REQUIRED_SCRUBS_PER_PART,
-  SMALL_BODY_PARTS,
+  TRACE_COMPLETION_PERCENTAGE,
   WASH_SPRITE_ROWS,
 } from './wash.config';
 import {
@@ -37,33 +35,16 @@ export class WashService {
     return null;
   }
 
-  // Check if scrubbing motion is valid
-  isValidScrub(
-    startPos: { x: number; y: number },
-    endPos: { x: number; y: number },
-  ): boolean {
-    const distance = Math.sqrt(
-      Math.pow(endPos.x - startPos.x, 2) + Math.pow(endPos.y - startPos.y, 2),
-    );
-    return distance >= MIN_SCRUB_DISTANCE;
-  }
-
   // Process user interaction and return updated game state
   processInteraction(
     gameState: WashGameState,
-    scrubData: MouseScrubData,
+    _scrubData: MouseScrubData, // No longer used
     mousePos: { x: number; y: number },
   ): WashGameState {
-    const isSmallPart = SMALL_BODY_PARTS.includes(gameState.currentPart);
-
-    if (isSmallPart) {
-      return this.processTrace(gameState, mousePos);
-    } else {
-      return this.processScrub(gameState, scrubData, mousePos);
-    }
+    return this.processTrace(gameState, mousePos);
   }
 
-  // Process trace attempt for small body parts
+  // Process trace attempt for body parts
   private processTrace(
     gameState: WashGameState,
     mousePos: { x: number; y: number },
@@ -90,61 +71,22 @@ export class WashService {
     const targetHitbox = BODY_PART_HITBOXES.find(
       (hb) => hb.part === gameState.currentPart,
     );
-    if (targetHitbox && newHitCells.length >= targetHitbox.cells.length) {
-      return this.completeCurrentBodyPart(gameState);
+
+    if (targetHitbox) {
+      const requiredPercentage =
+        TRACE_COMPLETION_PERCENTAGE[gameState.currentPart] ?? 1.0;
+      const requiredCells = Math.floor(
+        targetHitbox.cells.length * requiredPercentage,
+      );
+
+      if (newHitCells.length >= requiredCells) {
+        return this.completeCurrentBodyPart(gameState);
+      }
     }
 
     return {
       ...gameState,
       hitCells: newHitCells,
-    };
-  }
-
-  // Process scrub attempt and return updated game state
-  private processScrub(
-    gameState: WashGameState,
-    scrubData: MouseScrubData,
-    mousePos: { x: number; y: number },
-  ): WashGameState {
-    // A scrub is only valid if it's a long enough drag
-    if (
-      !scrubData.lastPosition ||
-      !this.isValidScrub(scrubData.lastPosition, mousePos)
-    ) {
-      return gameState;
-    }
-
-    // Check if either the start or end of the scrub is on the target body part
-    const startGridPos = this.getGridPosition(
-      scrubData.lastPosition.x,
-      scrubData.lastPosition.y,
-    );
-    const endGridPos = this.getGridPosition(mousePos.x, mousePos.y);
-
-    const startBodyPart = this.getBodyPartAtPosition(
-      startGridPos.x,
-      startGridPos.y,
-    );
-    const endBodyPart = this.getBodyPartAtPosition(endGridPos.x, endGridPos.y);
-
-    if (
-      startBodyPart !== gameState.currentPart &&
-      endBodyPart !== gameState.currentPart
-    ) {
-      return gameState; // Scrub was not on the target part
-    }
-
-    // Scrub is valid, update the count
-    const newScrubCount = gameState.currentScrubCount + 1;
-
-    // Check if body part is now complete
-    if (newScrubCount >= REQUIRED_SCRUBS_PER_PART) {
-      return this.completeCurrentBodyPart(gameState);
-    }
-
-    return {
-      ...gameState,
-      currentScrubCount: newScrubCount,
     };
   }
 

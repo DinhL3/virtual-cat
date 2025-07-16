@@ -5,16 +5,11 @@ export const WASH_SPRITE_SIZE = 192; // 192x192 pixels
 export const GRID_SIZE = 16; // 16x16 grid
 export const CELL_SIZE = WASH_SPRITE_SIZE / GRID_SIZE; // 12 pixels per cell
 
-// Scrubbing mechanics
-export const REQUIRED_SCRUBS_PER_PART = 3;
-export const MIN_SCRUB_DISTANCE = 20; // Minimum pixels to count as a scrub
-export const SCRUB_RESET_DELAY = 500; // Reset scrub count after inactivity (ms)
-
-export const SMALL_BODY_PARTS: WashBodyPart[] = [
-  'front-leg',
-  'back-leg',
-  'tail',
-];
+// Cleaning mechanics
+export const TRACE_COMPLETION_PERCENTAGE: { [key in WashBodyPart]?: number } = {
+  head: 0.75,
+  torso: 0.75,
+};
 
 // Body part sequence (order matters!)
 export const BODY_PART_SEQUENCE: WashBodyPart[] = [
