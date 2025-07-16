@@ -26,7 +26,11 @@ import {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="wash-overlay">
+    <div
+      class="wash-overlay"
+      (mousedown)="$event.stopPropagation()"
+      (mouseup)="$event.stopPropagation()"
+    >
       <div class="wash-container">
         <div class="wash-header">
           <h3>Cat Washing Time!</h3>
@@ -51,6 +55,7 @@ import {
               (mouseup)="onMouseUp()"
               (mouseleave)="onMouseUp()"
               style="touch-action: none; border-radius: 6px; background: #e9ecef;"
+              [class.scrubbing-cursor]="isScrubbing()"
             ></canvas>
           </div>
 
@@ -140,6 +145,10 @@ import {
         font-weight: bold;
         color: #007bff;
       }
+
+      .scrubbing-cursor {
+        cursor: grabbing;
+      }
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -159,6 +168,7 @@ export class WashMinigameComponent implements AfterViewInit {
     this.washService.createInitialGameState(),
   );
   protected readonly canvasSize = WASH_SPRITE_SIZE;
+  protected isScrubbing = signal(false);
 
   protected currentBodyPart = computed(() => this.gameState().currentPart);
   protected progress = computed(() => {
@@ -250,6 +260,7 @@ export class WashMinigameComponent implements AfterViewInit {
   // Mouse event handlers
   onMouseDown(event: MouseEvent): void {
     event.preventDefault(); // Prevent default drag behavior
+    this.isScrubbing.set(true);
     const rect = this.canvasRef.nativeElement.getBoundingClientRect();
     const mousePos = {
       x: event.clientX - rect.left,
@@ -291,6 +302,7 @@ export class WashMinigameComponent implements AfterViewInit {
   }
 
   onMouseUp(): void {
+    this.isScrubbing.set(false);
     this.scrubData.isDown = false;
     this.scrubData.lastPosition = null;
   }
