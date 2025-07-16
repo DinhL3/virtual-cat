@@ -58,8 +58,6 @@ import {
               [class.scrubbing-cursor]="isScrubbing()"
             ></canvas>
           </div>
-
-          <div class="progress">Progress: {{ progress() }}%</div>
         </div>
       </div>
     </div>
@@ -171,14 +169,6 @@ export class WashMinigameComponent implements AfterViewInit {
   protected isScrubbing = signal(false);
 
   protected currentBodyPart = computed(() => this.gameState().currentPart);
-  protected progress = computed(() => {
-    const completedCount = this.gameState().completedParts.length;
-    const totalCount = BODY_PART_SEQUENCE.length;
-    if (totalCount === 0) {
-      return 100;
-    }
-    return Math.round((completedCount / totalCount) * 100);
-  });
 
   // Mouse/scrub state
   private scrubData: MouseScrubData = {
