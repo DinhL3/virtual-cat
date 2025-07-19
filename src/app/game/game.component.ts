@@ -61,6 +61,10 @@ export class GameComponent {
         return null;
       }
       const newMoney = currentSave.gameState.money + 10;
+
+      // Update the backend with the new money amount
+      this.updateMoneyOnBackend(newMoney);
+
       return {
         ...currentSave,
         gameState: {
@@ -69,6 +73,17 @@ export class GameComponent {
         },
       };
     });
+  }
+
+  private async updateMoneyOnBackend(newMoney: number): Promise<void> {
+    try {
+      await firstValueFrom(this.gameService.updateGameMoney(newMoney));
+      console.log(`Successfully updated money to ${newMoney} on backend`);
+    } catch (error) {
+      console.error('Failed to update money on backend:', error);
+      // You might want to show an error message to the user or retry the operation
+      // For now, we'll just log the error and continue with the local update
+    }
   }
 
   toggleMenu(): void {

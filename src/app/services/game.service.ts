@@ -49,4 +49,12 @@ export class GameService {
       characterName,
     });
   }
+
+  /**
+   * Update the game money
+   * @param money The amount of money to update
+   */
+  updateGameMoney(money: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/update`, { money });
+  }
 }
